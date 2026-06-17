@@ -16,26 +16,35 @@ function entrar() {
             .value
             .trim();
 
+    if (!usuario || !senha) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+    }
 
     console.log(usuario);
     console.log(senha);
 
-
-    if (
-        usuario === "admin" &&
-        senha === "123"
-    ) {
-
-        window.location.href =
-            "menu.html";
-
-    }
-
-    else {
-
-        window.location.href =
-            "camera.html";
-
-    }
-
+    fetch("/api/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ usuario, senha })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Usuário ou senha incorretos.");
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.usuario === "admin") {
+                window.location.href = "menu.html";
+            } else {
+                window.location.href = "camera.html";
+            }
+        })
+        .catch(error => {
+            alert(error.message);
+        });
 }
