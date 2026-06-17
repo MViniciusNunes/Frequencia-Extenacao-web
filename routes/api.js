@@ -51,22 +51,23 @@ router.delete('/:id', async (req, res) => {
 
 // ===== Rota de login
 
-router.post('/login', (req, res) => {
-    const { usuario, senha } = req.body;
+// ===== Rota de login =====
+router.post('/login', async (req, res) => {
+    try {
+        const { usuario, senha } = req.body;
 
-    const query = 'SELECT id, nome, usuario FROM users WHERE usuario = ? AND senha = ?';
+        // O Mongoose busca um documento que tenha exatamente esse usuário e senha
+        const user = await Usuario.findOne({ usuario: usuario, senha: senha });
 
-    db.query(query, [usuario, senha], (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: "Erro interno no servidor" });
-        }
-
-        if (results.length > 0) {
-            return res.status(200).json(results[0]);
+        if (user) {
+            // Retorna os dados do usuário se encontrar
+            return res.status(200).json({ id: user._id, nome: user.nome, usuario: user.usuario });
         } else {
             return res.status(401).json({ error: "Usuário ou senha incorretos" });
         }
-    });
+    } catch (err) {
+        return res.status(500).json({ error: "Erro interno no servidor: " + err.message });
+    }
 });
 
 
