@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Frequência - QR Code</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="css/frequencia.css">
+</head>
+<body>
+
+<div id="tela-qr">
+
+    <div class="cabecalho">
+        <h1>Frequência</h1>
+        <div class="logo-placeholder">  
+            <img src="images/logo.png" alt="Logo"></div>
+    </div>
+
+    <div class="qr-corpo">
+        <div id="qrcode-container">
+            <div id="qrcode"></div>
+        </div>
+
+        <div class="qr-code-label">
+            <span>Code:</span><br>
+            <div class="qr-code-valor" id="exibir-code"></div>
+        </div>
+
+        <p class="qr-info" id="qr-info-texto"></p>
+    </div>
+
+    <div class="rodape-botoes">
+        <button class="btn btn-editar" onclick="voltarEditar()">Editar</button>
+        <button class="btn btn-concluir" onclick="concluir()">Concluir</button>
+    </div>
+
+</div>
+
+<script src="js/qrcode_view.js"></script>
+</body>
+</html>

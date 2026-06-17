@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurar Frequência</title>
+    <link rel="stylesheet" href="css/frequencia.css">
+</head>
+<body>
+
+<div id="tela-config">
+
+    <div class="cabecalho">
+        <h1>Configurar<br>Frequência</h1>
+        <div class="logo-placeholder">ÁGAPE<br>UMA COMUNIDADE DE<br>AMOR</div>
+    </div>
+
+    <div class="card-form">
+        <div class="campo">
+            <label>Nome:</label>
+            <input type="text" id="input-nome" placeholder="Ex: Culto de Domingo">
+        </div>
+        <div class="campo">
+            <label>Tipo de Encontro:</label>
+            <select id="input-tipo">
+                <option value="">Selecione...</option>
+                <option>Culto</option>
+                <option>Célula</option>
+                <option>Reunião</option>
+                <option>Ensaio</option>
+                <option>Outro</option>
+            </select>
+        </div>
+        <div class="campo">
+            <label>Data:</label>
+            <input type="date" id="input-data">
+        </div>
+        <div class="campo">
+            <label>Descrição:</label>
+            <textarea id="input-descricao" placeholder="Opcional..."></textarea>
+        </div>
+    </div>
+
+    <div class="rodape-botoes">
+        <button class="btn btn-cancelar" onclick="cancelar()">Cancelar</button>
+        <button class="btn btn-gerar" onclick="irParaQR()">Gerar</button>
+    </div>
+
+</div>
+
+<script src="js/frequencia.js"></script>
+</body>
+</html>

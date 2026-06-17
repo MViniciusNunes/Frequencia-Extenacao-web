@@ -1,0 +1,226 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Georgia', serif;
+    min-height: 100vh;
+}
+
+/* ══════════════════════════
+   COMPONENTES COMPARTILHADOS
+══════════════════════════ */
+
+.cabecalho {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    position: relative; /* ESSENCIAL: define que o que for 'absolute' dentro dele respeita este bloco */
+    min-height: 80px;   /* Garante uma altura mínima para a logo não cortar */
+}
+
+.cabecalho h1 {
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #111;
+}
+
+.logo-placeholder {
+    position: absolute;
+    right: 30px;
+    top: 20px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Garante que a imagem fique dentro do círculo */
+}
+
+/* Regra para a imagem dentro da logo */
+.logo-placeholder img {
+    max-width: 90%;   /* Ajuste conforme necessário */
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.rodape-botoes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 30px;
+}
+
+.btn {
+    padding: 12px 28px;
+    border: none;
+    font-family: 'Georgia', serif;
+    font-weight: 900;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: opacity 0.2s;
+}
+
+.btn:hover { opacity: 0.85; }
+
+/* ══════════════════════════
+   TELA 1 — CONFIGURAR
+══════════════════════════ */
+
+#tela-config {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #f0f0f0;
+}
+
+#tela-config .rodape-botoes {
+    background: #f0f0f0;
+}
+
+.card-form {
+    margin: 10px 30px;
+    background: white;
+    border-radius: 12px;
+    padding: 24px 24px 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    flex: 1;
+}
+
+.campo {
+    margin-bottom: 18px;
+}
+
+.campo label {
+    display: block;
+    font-weight: 900;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: #111;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #e8e8e8;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    color: #111;
+}
+
+.campo input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.campo textarea {
+    resize: none;
+    height: 60px;
+}
+
+.btn-cancelar {
+    background: #e0e0e0;
+    color: #111;
+}
+
+.btn-gerar {
+    background: #111;
+    color: white;
+}
+
+/* ══════════════════════════
+   TELA 2 — QR CODE
+══════════════════════════ */
+
+#tela-qr {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: white;
+}
+
+#tela-qr .cabecalho h1 {
+    font-size: 1.6rem;
+    letter-spacing: 2px;
+}
+
+#tela-qr .rodape-botoes {
+    background: white;
+    border-top: 1px solid #eee;
+}
+
+.qr-corpo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+#qrcode-container {
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+}
+
+#qrcode-container canvas,
+#qrcode-container img {
+    display: block;
+}
+
+.qr-code-label {
+    text-align: center;
+}
+
+.qr-code-label span {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.qr-code-valor {
+    display: inline-block;
+    margin-top: 6px;
+    background: #e8e8e8;
+    border-radius: 8px;
+    padding: 10px 32px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: #111;
+}
+
+.qr-info {
+    text-align: center;
+    color: #555;
+    font-size: 0.85rem;
+    max-width: 280px;
+    line-height: 1.5;
+}
+
+.btn-editar {
+    background: #e0e0e0;
+    color: #111;
+}
+
+.btn-concluir {
+    background: #111;
+    color: white;
+}
