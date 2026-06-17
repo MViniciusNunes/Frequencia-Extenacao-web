@@ -1,41 +1,52 @@
+// routes/api.js
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+const Usuario = require('../models/Usuario');
 
-// ===== Rota de usuários
-
-router.post('/users', (req, res) => {
-    const { nome, email, usuario, senha } = req.body;
-
-    const query = 'INSERT INTO users (nome, email, usuario, senha) VALUES (?, ?, ?, ?)';
-    db.query(query, [nome, email, usuario, senha], (err, result) => {
-        if (err) return res.status(500).send(err);
-        res.status(201).json({ id: result.insertId, nome, email, usuario });
-    });
+// Criar novo usuário (Cadastro)
+router.post('/users', async (req, res) => {
+    try {
+        const { nome, email, usuario, senha } = req.body;
+        const novoUsuario = await Usuario.create({ nome, email, usuario, senha });
+        res.status(201).json(novoUsuario);
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
 });
 
-router.get('/users', (req, res) => {
-    db.query('SELECT id, nome, email, usuario FROM users', (err, results) => {
-        if (err) return res.status(500).send(err);
-        res.json(results);
-    });
+// Listar todos os usuários
+router.get('/users', async (req, res) => {
+    try {
+        const usuarios = await Usuario.find().select('-senha'); // Retorna tudo, exceto as senhas
+        res.json(usuarios);
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
 });
 
-router.put('/:id', (req, res) => {
-    const { nome, email } = req.body;
-    const { id } = req.params;
-    db.query('UPDATE users SET nome = ?, email = ? WHERE id = ?', [nome, email, id], (err) => {
-        if (err) return res.status(500).send(err);
-        res.json({ id, nome, email });
-    });
+// Atualizar usuário
+router.put('/:id', async (req, res) => {
+    try {
+        const { nome, email } = req.body;
+        const usuarioAtualizado = await Usuario.findByIdAndUpdate(
+            req.params.id, 
+            { nome, email }, 
+            { new: true }
+        );
+        res.json(usuarioAtualizado);
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
 });
 
-router.delete('/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('DELETE FROM users WHERE id = ?', [id], (err) => {
-        if (err) return res.status(500).send(err);
+// Deletar usuário
+router.delete('/:id', async (req, res) => {
+    try {
+        await Usuario.findByIdAndDelete(req.params.id);
         res.sendStatus(204);
-    });
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
 });
 
 // ===== Rota de login
