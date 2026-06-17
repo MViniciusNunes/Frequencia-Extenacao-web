@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Usuario = require('../models/Usuario');
+const Encontro = require('../models/Encontro');
 
 // Criar novo usuário (Cadastro)
 router.post('/users', async (req, res) => {
@@ -70,5 +71,26 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// ===== Rota para Criar Encontro (Frequência) =====
+router.post('/encontros', async (req, res) => {
+    try {
+        const { codigo, nome, tipo, data, descricao } = req.body;
+        
+        // Cria o evento e deixa a lista de participantes vazia no início
+        const novoEncontro = new Encontro({
+            codigo,
+            nome,
+            tipo,
+            data,
+            descricao,
+            participantes: [] 
+        });
+        
+        await novoEncontro.save();
+        res.status(201).json({ mensagem: "Encontro criado com sucesso!", encontro: novoEncontro });
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao criar encontro: " + err.message });
+    }
+});
 
 module.exports = router;
