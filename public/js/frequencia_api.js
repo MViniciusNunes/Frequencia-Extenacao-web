@@ -6,7 +6,7 @@ async function carregarDadosIniciais() {
         const respFreq = await fetch('/api/frequencias-completas');
         registros = await respFreq.json(); 
         
-        atualizarTabelas(); // Chama a UI para desenhar a tela
+        atualizarTabelas(); 
     } catch (error) {
         console.error("Erro ao carregar dados:", error);
     }

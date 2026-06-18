@@ -21,7 +21,6 @@ app.use('/api', usuariosRoutes);
 app.use('/api', encontrosRoutes);
 app.use('/api', frequenciasRoutes);
 
-// Depois
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor iniciado na porta ${PORT}`);

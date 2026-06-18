@@ -10,7 +10,6 @@ body {
     padding: 50px;
 }
 
-/* Filtro */
 .filtro {
     display: flex;
     gap: 15px;
@@ -28,13 +27,11 @@ body {
     width: 200px;
 }
 
-/* Tabelas: escondidas por padrão — o JS controla */
 .tabela-usuarios,
 .tabela-faltas {
     display: none;
 }
 
-/* Tabelas */
 table {
     width: 100%;
     margin-top: 40px;
@@ -60,7 +57,6 @@ tr:hover {
     background: #f8fbff;
 }
 
-/* Modais */
 .modal {
     display: none;
     position: fixed;
@@ -84,7 +80,6 @@ tr:hover {
     color: #224bb8;
 }
 
-/* Lista com scroll dentro do modal */
 .lista-rolagem {
     max-height: 200px;
     overflow-y: auto;
@@ -92,7 +87,6 @@ tr:hover {
     padding-right: 10px;
 }
 
-/* Item: nome à esquerda, select à direita */
 .usuario-item {
     display: flex;
     justify-content: space-between;
@@ -112,7 +106,6 @@ tr:hover {
     cursor: pointer;
 }
 
-/* Botões do modal */
 .botoes-edicao {
     position: absolute;
     bottom: 15px;
@@ -121,7 +114,6 @@ tr:hover {
     gap: 10px;
 }
 
-/* Botões gerais */
 button {
     padding: 10px 20px;
     border: none;

@@ -1,105 +1,68 @@
-body{
-
-margin:0;
-
-background:
-
-#f5f7fb;
-
-font-family:Arial;
-
+body {
+    margin: 0;
+    background: #f5f7fb;
+    font-family: Arial, sans-serif;
 }
 
 button.cancelar {
     background: #d9534f;
-    position: fixed; /* Fixa o elemento na tela */
-    top: 20px;       /* Distância do topo */
-    right: 20px;     /* Distância da direita */
-    z-index: 1000;   /* Garante que ele fique por cima de outros elementos */
+    position: fixed;
+    top: 20px;       
+    right: 20px;     
+    z-index: 1000;   
 }
 
-.dashboard{
-
-max-width:1200px;
-
-margin:auto;
-
-padding:60px;
-
-text-align:center;
-
+.dashboard {
+    max-width: 1200px;
+    margin: auto;
+    padding: 60px;
+    text-align: center;
 }
 
-.logo{
-
-width:180px;
-
-margin-bottom:30px;
-
+.logo {
+    width: 180px;
+    margin-bottom: 30px;
 }
 
-.cards{
-
-display:grid;
-
-grid-template-columns:
-
-repeat(
-3,
-1fr
-);
-
-gap:30px;
-
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
 }
 
-.card{
-
-background:white;
-
-padding:40px;
-
-border-radius:25px;
-
-box-shadow:
-
-0 15px 35px
-rgba(0,0,0,.08);
-
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease; 
 }
 
-.card:hover{
-
-transform:
-
-translateY(-6px);
-
+.card:hover {
+    transform: translateY(-6px);
 }
 
-.card h2{
-
-color:#224bb8;
-
+.card h2 {
+    color: #224bb8;
+    margin: 0 0 10px 0; 
 }
 
-.card p{
-
-color:#666;
-
+.card p {
+    color: #666;
+    margin: 0;
 }
 
-button{
+button {
+    margin-top: 20px;
+    padding: 14px 26px;
+    background: #224bb8;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+}
 
-margin-top:20px;
-
-padding:14px 26px;
-
-background:#224bb8;
-
-color:white;
-
-border:none;
-
-border-radius:10px;
-
+button:hover {
+    background: #1a3a8f;
 }

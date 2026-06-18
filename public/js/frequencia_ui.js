@@ -179,5 +179,4 @@ if (selectFiltro) selectFiltro.addEventListener('change', atualizarTabelas);
 const inputPesquisa = document.getElementById('nome');
 if (inputPesquisa) inputPesquisa.addEventListener('input', atualizarTabelas);
 
-// Dá a partida no motor!
 carregarDadosIniciais();

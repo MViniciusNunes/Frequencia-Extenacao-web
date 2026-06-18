@@ -9,7 +9,6 @@ function gerarCodigo() {
     return code;
 }
 
-// Salva no banco de dados e DEPOIS vai para a tela do QR
 async function irParaQR() {
     const nome  = document.getElementById('input-nome').value.trim();
     const tipo  = document.getElementById('input-tipo').value;
@@ -25,7 +24,6 @@ async function irParaQR() {
     const registro = { codigo, nome, tipo, data, descricao };
 
     try {
-        // Manda pro banco de dados AGORA!
         const response = await fetch('/api/encontros', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

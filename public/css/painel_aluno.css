@@ -1,4 +1,3 @@
-
 .header-aluno {
     display: flex;
     justify-content: space-between;
@@ -11,7 +10,6 @@
     color: #224bb8;
 }
 
-/* Card central de Registro de Presença */
 .card-presenca {
     background: white;
     padding: 30px;
@@ -48,7 +46,6 @@
     font-size: 18px;
 }
 
-/* Placares de Frequência */
 .placar-container {
     display: flex;
     gap: 20px;
@@ -73,33 +70,29 @@
     margin: 10px 0 0 0;
 }
 
-/* Cores específicas de cada Placar */
 .card-p { background: #e8f5e9; }
-.texto-p { color: #2e7d32; } /* Verde */
+.texto-p { color: #2e7d32; } 
 
 .card-f { background: #ffebee; }
-.texto-f { color: #c62828; } /* Vermelho */
+.texto-f { color: #c62828; } 
 
 .card-fj { background: #fff8e1; }
-.texto-fj { color: #f57f17; } /* Laranja */
+.texto-fj { color: #f57f17; } 
 
-/* Tabela do Aluno */
 .tabela-historico {
-    display: table; /* Força a tabela a aparecer, já que no frequencia.css ela vem escondida */
+    display: table;
     width: 100%;
 }
-
 
 .status-historico {
     font-weight: bold;
     font-size: 18px;
 }
 
-.status-presenca { color: #2e7d32; }    /* Verde */
-.status-falta { color: #c62828; }       /* Vermelho */
-.status-justificada { color: #f57f17; } /* Laranja */
+.status-presenca { color: #2e7d32; }    
+.status-falta { color: #c62828; }     
+.status-justificada { color: #f57f17; } 
 
-/* ================= BANNER DO RETIRO ================= */
 .banner-retiro {
     padding: 15px 20px;
     border-radius: 12px;
@@ -110,7 +103,7 @@
     transition: background-color 0.3s;
 }
 
-.banner-vai { background-color: #1a9e5c; }    /* Verde */
-.banner-quase { background-color: #f57f17; }  /* Laranja */
-.banner-nao { background-color: #dc3545; }    /* Vermelho */
-.banner-vazio { background-color: #888; }     /* Cinza */
+.banner-vai { background-color: #1a9e5c; } 
+.banner-quase { background-color: #f57f17; }  
+.banner-nao { background-color: #dc3545; }  
+.banner-vazio { background-color: #888; }   

@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const conectarDB = async () => {
     try {
-        // Agora ele puxa a URL segura do seu arquivo .env
         await mongoose.connect(process.env.MONGO_URI, {
             family: 4 
         });
