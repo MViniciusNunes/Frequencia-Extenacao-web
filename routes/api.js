@@ -1,37 +1,77 @@
 const express = require('express');
 const router = express.Router();
-const Encontro = require('../models/Encontros'); // Ajuste o nome do arquivo conforme necessário
 const Frequencia = require('../models/frequencias');
 const Usuario = require('../models/Usuario');
-const Encontro = require('../models/Encontro');
+const Encontro = require('../models/Encontro'); // Apenas a versão correta, no singular
 
-// --- CRUD DE ENCONTROS ---
-router.post('/encontros', async (req, res) => {
+// ... (Mantenha o post /encontros e /frequencia normais)
+
+// Rota corrigida para não "zerar" a data
+// Rota corrigida: Busca a data do encontro mesmo sem frequências registradas
+router.get('/frequencias-completas', async (req, res) => {
     try {
-        const novoEncontro = await Encontro.create(req.body);
-        res.status(201).json(novoEncontro);
+        // 1. Busca todos os encontros para listar as datas
+        const encontros = await Encontro.find();
+        
+        // 2. Busca as frequências (se houver alguma)
+        const frequencias = await Frequencia.find()
+            .populate('usuarioId', 'nome')
+            .populate('encontroId', 'data'); 
+        
+        const formatado = {};
+        
+        // 3. Cria as "colunas" de data baseadas nos encontros que existem
+        encontros.forEach(enc => {
+            const dataString = enc.data;
+            if (dataString && !formatado[dataString]) {
+                formatado[dataString] = {};
+            }
+        });
+        
+        // 4. Preenche quem tem falta/presença
+        frequencias.forEach(doc => {
+            if (doc.encontroId && doc.usuarioId) {
+                const dataString = doc.encontroId.data; 
+                const nome = doc.usuarioId.nome;
+                
+                if (!formatado[dataString]) formatado[dataString] = {};
+                formatado[dataString][nome] = doc.status;
+            }
+        });
+        
+        res.json(formatado);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 });
 
-// --- CRUD DE PRESENÇA (Salvar P, F, FJ) ---
-router.post('/frequencia', async (req, res) => {
+// ===== Nova Rota para Atualizar Frequência Manualmente (Pelo Modal) =====
+router.put('/atualizar-frequencia', async (req, res) => {
     try {
-        const { encontroId, usuarioId, status } = req.body;
+        const { nome, data, status } = req.body;
         
-        // Se já existe, atualiza; se não, cria (upsert)
+        // Procura os IDs corretos no banco baseados no nome e na data que o front-end mandou
+        const usuario = await Usuario.findOne({ nome: nome });
+        const encontro = await Encontro.findOne({ data: data });
+        
+        if (!usuario || !encontro) {
+            return res.status(404).json({ erro: "Usuário ou Encontro não encontrado." });
+        }
+        
+        // Salva ou atualiza a presença/falta no banco
         const registro = await Frequencia.findOneAndUpdate(
-            { encontroId, usuarioId },
-            { status },
-            { new: true, upsert: true }
+            { encontroId: encontro._id, usuarioId: usuario._id },
+            { status: status },
+            { new: true, upsert: true } // Upsert cria o registro se ele ainda não existir
         );
+        
         res.status(200).json(registro);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 });
 
+// ... (Mantenha o restante do arquivo intacto)
 // GET: Buscar usuários para exibir no modal
 router.get('/users', async (req, res) => {
     try {
