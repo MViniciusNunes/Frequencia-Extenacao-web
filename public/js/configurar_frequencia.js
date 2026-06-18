@@ -18,11 +18,14 @@ function gerarCodigo() {
 // ──────────────────────────────────────
 // GERAR — valida, salva e vai para tela 2
 // ──────────────────────────────────────
-function irParaQR() {
+// ──────────────────────────────────────
+// GERAR — valida, salva no BD e vai para tela 2
+// ──────────────────────────────────────
+async function irParaQR() {
     const nome  = document.getElementById('input-nome').value.trim();
     const tipo  = document.getElementById('input-tipo').value;
     const data  = document.getElementById('input-data').value;
-    const descr = document.getElementById('input-descricao').value.trim();
+    const descricao = document.getElementById('input-descricao').value.trim();
 
     if (!nome || !tipo || !data) {
         alert('Preencha Nome, Tipo de Encontro e Data.');
@@ -30,15 +33,27 @@ function irParaQR() {
     }
 
     const codigo = gerarCodigo();
+    const registro = { codigo, nome, tipo, data, descricao };
 
-    const registro = { codigo, nome, tipo, data, descr };
-    frequencias.push(registro);
+    try {
+        // Dispara os dados para a rota no back-end
+        const response = await fetch('/api/encontros', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(registro)
+        });
 
-    // Persiste o array e o registro atual para a tela 2 usar
-    sessionStorage.setItem('frequencias', JSON.stringify(frequencias));
-    sessionStorage.setItem('registroAtual', JSON.stringify(registro));
-
-    window.location.href = 'frequencia_qrcode.html';
+        if (response.ok) {
+            // Guarda o registroAtual na sessão apenas para a próxima tela conseguir exibir o QR Code
+            sessionStorage.setItem('registroAtual', JSON.stringify(registro));
+            window.location.href = 'frequencia_qrcode.html';
+        } else {
+            alert('Erro ao salvar o encontro no banco de dados.');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro de conexão com o servidor.');
+    }
 }
 
 // ──────────────────────────────────────

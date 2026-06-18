@@ -5,6 +5,40 @@ const Usuario = require('../models/Usuario');
 const Encontro = require('../models/Encontro'); // Apenas a versão correta, no singular
 
 // ... (Mantenha o post /encontros e /frequencia normais)
+// ===== Rota de Cadastro =====
+router.post('/users', async (req, res) => {
+    try {
+        const { nome, email, usuario, senha } = req.body;
+        const novoUsuario = new Usuario({ nome, email, usuario, senha });
+        await novoUsuario.save();
+        res.status(201).json({ mensagem: "Usuário criado com sucesso!", id: novoUsuario._id });
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao cadastrar: " + err.message });
+    }
+});
+
+// ===== Rota de Login =====
+// ===== Rota de Login =====
+router.post('/login', async (req, res) => {
+    try {
+        const { usuario, senha } = req.body;
+        const user = await Usuario.findOne({ usuario: usuario, senha: senha });
+        
+        if (user) {
+            // A MÁGICA AQUI: Agora o servidor avisa se a pessoa é Admin ou não
+            return res.status(200).json({ 
+                id: user._id, 
+                nome: user.nome, 
+                usuario: user.usuario,
+                isAdmin: user.isAdmin 
+            });
+        } else {
+            return res.status(401).json({ error: "Usuário ou senha incorretos" });
+        }
+    } catch (err) {
+        return res.status(500).json({ error: "Erro interno no servidor: " + err.message });
+    }
+});
 
 // Rota corrigida para não "zerar" a data
 // Rota corrigida: Busca a data do encontro mesmo sem frequências registradas
@@ -106,11 +140,20 @@ router.post('/encontros', async (req, res) => {
 });
 
 // ===== Rota para Deletar Usuário =====
+// ===== Rota para Deletar Usuário (Com Exclusão em Cascata) =====
 router.delete('/users/:id', async (req, res) => {
     try {
         const idDoUsuario = req.params.id;
+        
+        // 1. Limpeza: Busca e apaga TODAS as presenças/faltas atreladas a esse ID
+        await Frequencia.deleteMany({ usuarioId: idDoUsuario });
+        
+        // 2. Exclusão: Apaga o documento principal do usuário
         await Usuario.findByIdAndDelete(idDoUsuario);
-        res.status(200).json({ mensagem: "Usuário excluído com sucesso" });
+        
+        res.status(200).json({ 
+            mensagem: "Usuário e todo o seu histórico de frequências foram excluídos com sucesso!" 
+        });
     } catch (err) {
         res.status(500).json({ erro: "Erro ao excluir: " + err.message });
     }
