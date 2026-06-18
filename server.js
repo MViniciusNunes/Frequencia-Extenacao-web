@@ -14,8 +14,13 @@ app.get("/", (req, res) => {
   res.send("<h1>Página Inicial</h1><p>O servidor está funcionando!</p>");
 });
 
-const apiRoutes = require('./routes/api'); 
-app.use('/api', apiRoutes);
+const usuariosRoutes = require('./routes/usuariosRoutes');
+const encontrosRoutes = require('./routes/encontrosRoutes');
+const frequenciasRoutes = require('./routes/frequenciasRoutes');
+
+app.use('/api', usuariosRoutes);
+app.use('/api', encontrosRoutes);
+app.use('/api', frequenciasRoutes);
 
 // Depois
 const PORT = process.env.PORT || 3000;

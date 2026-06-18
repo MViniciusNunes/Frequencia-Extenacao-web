@@ -1,51 +1,10 @@
-let usuarios = []; 
-let registros = {}; 
-
+// ==========================================
+// ELEMENTOS VISUAIS E MODAIS
+// ==========================================
 const selectFiltro = document.getElementById('escolha');
 const tabelaUsuarios = document.querySelector('.tabela-usuarios');
 const tabelaFaltas   = document.querySelector('.tabela-faltas');
 
-// ================== UTILITÁRIO DE DATA ==================
-function normalizarData(dataStr) {
-    if (!dataStr) return dataStr;
-    return dataStr.toString().substring(0, 10);
-}
-
-function formatarDataExibicao(dataStr) {
-    const d = normalizarData(dataStr);
-    if (!d || d.length < 10) return dataStr;
-    const [ano, mes, dia] = d.split('-');
-    return `${dia}/${mes}/${ano}`;
-}
-
-// ================== CONTAGENS (CORRIGIDAS PARA PADRÃO 'FALTA') ==================
-function contarFaltasPorUsuario(nome) {
-    let faltas = 0;
-    Object.keys(registros).forEach(encId => {
-        const enc = registros[encId];
-        if (enc && enc.info) {
-            // MÁGICA 1: Se não houver registro para o aluno, o padrão agora é 'F'
-            const status = (enc.alunos && enc.alunos[nome]) ? enc.alunos[nome] : 'F';
-            if (status === 'F') faltas++;
-        }
-    });
-    return faltas;
-}
-
-function contarFaltasPorEncontro(encId) {
-    const enc = registros[encId];
-    if (!enc || !enc.info) return 0;
-    
-    let faltas = 0;
-    // Para a tabela de data, percorre todos os usuários buscando quem não marcou 'P' ou 'FJ'
-    usuarios.forEach(user => {
-        const status = (enc.alunos && enc.alunos[user.nome]) ? enc.alunos[user.nome] : 'F';
-        if (status === 'F') faltas++;
-    });
-    return faltas;
-}
-
-// ================== RENDERIZAÇÃO INTELIGENTE ==================
 function renderTabelaUsuarios() {
     const tbody = document.getElementById('tbody-usuarios');
     if(!tbody) return;
@@ -54,7 +13,6 @@ function renderTabelaUsuarios() {
     const termoBusca = document.getElementById('nome').value.toLowerCase().trim();
     const regexNumerico = /^(>=|<=|>|<|=)?\s*(\d+)$/;
     const matchNumerico = termoBusca.match(regexNumerico);
-
     const totalEncontros = Object.keys(registros).length;
 
     usuarios.forEach(user => {
@@ -65,7 +23,6 @@ function renderTabelaUsuarios() {
             if (matchNumerico) {
                 const operador = matchNumerico[1] || '='; 
                 const valorFiltro = parseInt(matchNumerico[2], 10);
-                
                 if (operador === '>') mostrar = faltas > valorFiltro;
                 else if (operador === '<') mostrar = faltas < valorFiltro;
                 else if (operador === '>=') mostrar = faltas >= valorFiltro;
@@ -79,13 +36,12 @@ function renderTabelaUsuarios() {
         if (!mostrar) return;
 
         let statusRetiro = "-";
-        let classeRetiro = "retiro-vazio"; // Usa a classe do CSS
+        let classeRetiro = "retiro-vazio"; 
 
         if (totalEncontros === 0) {
             statusRetiro = "Sem encontros";
         } else {
             const presencaPorcento = ((totalEncontros - faltas) / totalEncontros) * 100;
-            
             if (presencaPorcento >= 80) {
                 statusRetiro = "Vai";
                 classeRetiro = "retiro-vai"; 
@@ -98,7 +54,7 @@ function renderTabelaUsuarios() {
             }
         }
 
-  tbody.innerHTML += `
+        tbody.innerHTML += `
             <tr>
                 <td>${user.nome}</td>
                 <td>${faltas}</td>
@@ -121,19 +77,16 @@ function renderTabelaFaltas() {
 
     Object.keys(registros).forEach(encId => {
         const enc = registros[encId];
-        
         if (!enc || !enc.info) return;
 
         const dataExibicao = `${formatarDataExibicao(enc.info.data)} - ${enc.info.nome || 'Encontro'}`;
         const faltas = contarFaltasPorEncontro(encId);
-
         let mostrar = true;
 
         if (termoBusca) {
             if (matchNumerico) {
                 const operador = matchNumerico[1] || '=';
                 const valorFiltro = parseInt(matchNumerico[2], 10);
-                
                 if (operador === '>') mostrar = faltas > valorFiltro;
                 else if (operador === '<') mostrar = faltas < valorFiltro;
                 else if (operador === '>=') mostrar = faltas >= valorFiltro;
@@ -169,36 +122,6 @@ function atualizarTabelas() {
     }
 }
 
-// ================== CARGA DE DADOS ==================
-async function carregarDadosIniciais() {
-    try {
-        const respUsers = await fetch('/api/users-full');
-        usuarios = await respUsers.json(); 
-
-        const respFreq = await fetch('/api/frequencias-completas');
-        registros = await respFreq.json(); 
-        
-        atualizarTabelas(); 
-    } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-    }
-}
-
-if (selectFiltro) {
-    selectFiltro.addEventListener('change', atualizarTabelas);
-}
-
-const inputPesquisa = document.getElementById('nome');
-if (inputPesquisa) {
-    inputPesquisa.addEventListener('input', atualizarTabelas);
-}
-
-carregarDadosIniciais();
-
-// ================== MODAIS ==================
-let usuarioAtivo = null;
-let dataAtivaId = null;
-
 function abrirModalUsuario(nome) {
     usuarioAtivo = nome;
     document.getElementById('modal-usuario-titulo').textContent = nome;
@@ -209,7 +132,6 @@ function abrirModalUsuario(nome) {
         const enc = registros[encId];
         if (!enc || !enc.info) return; 
         
-        // MÁGICA 2: O modal também nasce marcando 'F' se a pessoa não foi no evento
         const statusAtual = (enc.alunos && enc.alunos[nome]) ? enc.alunos[nome] : 'F';
         const dataExibicao = `${formatarDataExibicao(enc.info.data)} - ${enc.info.nome || 'Encontro'}`;
         
@@ -236,7 +158,6 @@ function abrirModalData(encId) {
     lista.innerHTML = '';
 
     usuarios.forEach(user => {
-        // MÁGICA 2: O modal também nasce marcando 'F' se a pessoa não foi no evento
         const statusAtual = (enc.alunos && enc.alunos[user.nome]) ? enc.alunos[user.nome] : 'F';
         
         lista.innerHTML += `
@@ -257,83 +178,12 @@ function fecharModal() {
     document.getElementById('modalData').style.display    = 'none';
 }
 
-// ================== FUNÇÕES DE SALVAR ==================
-async function salvarModalData() {
-    const selects = document.querySelectorAll('#modal-data-lista select');
-    const alterados = Array.from(selects).filter(s => s.value !== s.getAttribute('data-original'));
+// ==========================================
+// INICIALIZAÇÃO DA TELA
+// ==========================================
+if (selectFiltro) selectFiltro.addEventListener('change', atualizarTabelas);
+const inputPesquisa = document.getElementById('nome');
+if (inputPesquisa) inputPesquisa.addEventListener('input', atualizarTabelas);
 
-    if (alterados.length === 0) {
-        alert("Nenhuma alteração foi feita.");
-        fecharModal();
-        return;
-    }
-
-    const promessas = alterados.map(select => {
-        return fetch('/api/atualizar-frequencia', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                nome: select.getAttribute('data-nome'),
-                encontroId: dataAtivaId, 
-                status: select.value
-            })
-        });
-    });
-
-    try {
-        const respostas = await Promise.all(promessas);
-        const comErro = respostas.filter(r => !r.ok);
-        
-        if (comErro.length > 0) {
-            alert("⚠️ Algumas alterações falharam! Verifique a conexão com o banco de dados.");
-        } else {
-            alert("Frequência da data salva com sucesso!");
-        }
-        
-        fecharModal();
-        location.reload();
-    } catch (error) {
-        console.error("Erro ao salvar:", error);
-        alert("Ocorreu um erro ao conectar com o servidor.");
-    }
-}
-
-async function salvarModalUsuario() {
-    const selects = document.querySelectorAll('#modal-usuario-lista select');
-    const alterados = Array.from(selects).filter(s => s.value !== s.getAttribute('data-original'));
-
-    if (alterados.length === 0) {
-        alert("Nenhuma alteração foi feita.");
-        fecharModal();
-        return;
-    }
-
-    const promessas = alterados.map(select => {
-        return fetch('/api/atualizar-frequencia', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                nome: usuarioAtivo,
-                encontroId: select.getAttribute('data-id'), 
-                status: select.value
-            })
-        });
-    });
-
-    try {
-        const respostas = await Promise.all(promessas);
-        const comErro = respostas.filter(r => !r.ok);
-        
-        if (comErro.length > 0) {
-            alert("⚠️ Algumas alterações falharam! Verifique a conexão com o banco de dados.");
-        } else {
-            alert("Frequência do aluno salva com sucesso!");
-        }
-        
-        fecharModal();
-        location.reload(); 
-    } catch (error) {
-        console.error("Erro ao salvar:", error);
-        alert("Ocorreu um erro ao conectar com o servidor.");
-    }
-}
+// Dá a partida no motor!
+carregarDadosIniciais();
