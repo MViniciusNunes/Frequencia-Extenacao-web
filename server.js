@@ -17,6 +17,8 @@ app.get("/", (req, res) => {
 const apiRoutes = require('./routes/api'); 
 app.use('/api', apiRoutes);
 
-app.listen(3000, () => {
-  console.log("Servidor iniciado na porta 3000");
+// Depois
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor iniciado na porta ${PORT}`);
 });
