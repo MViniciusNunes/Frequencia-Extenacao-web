@@ -18,15 +18,31 @@ function formatarDataExibicao(dataStr) {
     return `${dia}/${mes}/${ano}`;
 }
 
-// ================== CONTAGENS (ATUALIZADAS PARA ID E ESTRUTURA NOVA) ==================
+// ================== CONTAGENS (CORRIGIDAS PARA PADRÃO 'FALTA') ==================
 function contarFaltasPorUsuario(nome) {
-    return Object.values(registros).filter(enc => enc.alunos && enc.alunos[nome] === 'F').length;
+    let faltas = 0;
+    Object.keys(registros).forEach(encId => {
+        const enc = registros[encId];
+        if (enc && enc.info) {
+            // MÁGICA 1: Se não houver registro para o aluno, o padrão agora é 'F'
+            const status = (enc.alunos && enc.alunos[nome]) ? enc.alunos[nome] : 'F';
+            if (status === 'F') faltas++;
+        }
+    });
+    return faltas;
 }
 
 function contarFaltasPorEncontro(encId) {
     const enc = registros[encId];
-    if (!enc || !enc.alunos) return 0;
-    return Object.values(enc.alunos).filter(s => s === 'F').length;
+    if (!enc || !enc.info) return 0;
+    
+    let faltas = 0;
+    // Para a tabela de data, percorre todos os usuários buscando quem não marcou 'P' ou 'FJ'
+    usuarios.forEach(user => {
+        const status = (enc.alunos && enc.alunos[user.nome]) ? enc.alunos[user.nome] : 'F';
+        if (status === 'F') faltas++;
+    });
+    return faltas;
 }
 
 // ================== RENDERIZAÇÃO INTELIGENTE ==================
@@ -62,7 +78,6 @@ function renderTabelaUsuarios() {
 
         if (!mostrar) return;
 
-        // Calculadora de Elegibilidade para o Retiro
         let statusRetiro = "-";
         let corRetiro = "#888"; 
 
@@ -161,7 +176,7 @@ async function carregarDadosIniciais() {
         usuarios = await respUsers.json(); 
 
         const respFreq = await fetch('/api/frequencias-completas');
-        registros = await respFreq.json(); // Agora pegamos direto, sem modificar a chave (usa o ID)
+        registros = await respFreq.json(); 
         
         atualizarTabelas(); 
     } catch (error) {
@@ -194,7 +209,8 @@ function abrirModalUsuario(nome) {
         const enc = registros[encId];
         if (!enc || !enc.info) return; 
         
-        const statusAtual = (enc.alunos && enc.alunos[nome]) ? enc.alunos[nome] : 'P';
+        // MÁGICA 2: O modal também nasce marcando 'F' se a pessoa não foi no evento
+        const statusAtual = (enc.alunos && enc.alunos[nome]) ? enc.alunos[nome] : 'F';
         const dataExibicao = `${formatarDataExibicao(enc.info.data)} - ${enc.info.nome || 'Encontro'}`;
         
         lista.innerHTML += `
@@ -220,7 +236,8 @@ function abrirModalData(encId) {
     lista.innerHTML = '';
 
     usuarios.forEach(user => {
-        const statusAtual = (enc.alunos && enc.alunos[user.nome]) ? enc.alunos[user.nome] : 'P';
+        // MÁGICA 2: O modal também nasce marcando 'F' se a pessoa não foi no evento
+        const statusAtual = (enc.alunos && enc.alunos[user.nome]) ? enc.alunos[user.nome] : 'F';
         
         lista.innerHTML += `
             <div class="usuario-item">
