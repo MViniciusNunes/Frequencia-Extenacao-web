@@ -1,3 +1,13 @@
+const sessaoUsuario = JSON.parse(sessionStorage.getItem('usuarioLogado') || 'null');
+
+if (!sessaoUsuario) {
+    window.location.href = 'login.html';
+} 
+else if (sessaoUsuario.isAdmin !== true && String(sessaoUsuario.isAdmin).toLowerCase() !== "true") {
+    alert("Acesso negado. Esta página é restrita para Coordenadores.");
+    window.location.href = 'painel_aluno.html';
+}
+
 let listaUsuarios = [];
 let usuarioEditandoId = null;
 
@@ -79,10 +89,15 @@ async function criarUsuario() {
         return;
     }
 
+    const usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+
     try {
         const response = await fetch('/api/users', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${usuarioLogado.token}` 
+            },
             body: JSON.stringify({ nome, email, usuario, senha, isAdmin })
         });
 
@@ -141,10 +156,15 @@ async function salvarEdicao() {
     const payload = { nome, email, usuario, isAdmin };
     if (senha) payload.senha = senha;
 
+    const usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+
     try {
         const response = await fetch(`/api/users/${usuarioEditandoId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${usuarioLogado.token}` 
+            },
             body: JSON.stringify(payload)
         });
 
@@ -175,9 +195,15 @@ async function confirmarExclusaoModal() {
     if (palavraDigitada === null) return;
 
     if (palavraDigitada.toLowerCase().trim() === 'apagar') {
+        
+        const usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+
         try {
             const response = await fetch(`/api/users/${usuarioEditandoId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${usuarioLogado.token}` 
+                }
             });
 
             if (response.ok) {

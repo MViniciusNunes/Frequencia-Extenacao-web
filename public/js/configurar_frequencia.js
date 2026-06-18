@@ -1,3 +1,12 @@
+const sessaoUsuario = JSON.parse(sessionStorage.getItem('usuarioLogado') || 'null');
+
+if (!sessaoUsuario) {
+    window.location.href = 'login.html';
+} else if (sessaoUsuario.isAdmin !== true && String(sessaoUsuario.isAdmin).toLowerCase() !== "true") {
+    alert("Acesso negado. Esta página é restrita para Coordenadores.");
+    window.location.href = 'painel_aluno.html';
+}
+
 const frequencias = JSON.parse(sessionStorage.getItem('frequencias') || '[]');
 
 function gerarCodigo() {
@@ -17,6 +26,12 @@ async function irParaQR() {
 
     if (!nome || !tipo || !data) {
         alert('Preencha Nome, Tipo de Encontro e Data.');
+        return;
+    }
+
+    const dataHoje = new Date().toISOString().split('T')[0];
+    if (data > dataHoje) {
+        alert('❌ Não é permitido criar um encontro com uma data no futuro. Por favor, escolha a data de hoje ou uma data anterior.');
         return;
     }
 
@@ -52,12 +67,18 @@ function cancelar() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    const inputData = document.getElementById('input-data');
+    if (inputData) {
+        const dataHoje = new Date().toISOString().split('T')[0];
+        inputData.setAttribute('max', dataHoje);
+    }
+
     const rascunho = JSON.parse(sessionStorage.getItem('rascunho') || 'null');
     if (rascunho) {
         document.getElementById('input-nome').value    = rascunho.nome  || '';
         document.getElementById('input-tipo').value    = rascunho.tipo  || '';
         document.getElementById('input-data').value    = rascunho.data  || '';
-        document.getElementById('input-descricao').value = rascunho.descr || '';
+        document.getElementById('input-descricao').value = rascunho.descricao || ''; 
         sessionStorage.removeItem('rascunho');
     }
 });

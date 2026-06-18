@@ -1,25 +1,30 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken'); 
+const { verificarToken, verificarAdmin } = require('../middlewares/auth'); 
+
 const Usuario = require('../models/Usuario');
 const Frequencia = require('../models/frequencias');
-
-router.post('/users', async (req, res) => {
-    try {
-        const { nome, email, usuario, senha, isAdmin } = req.body;
-        const novoUsuario = new Usuario({ nome, email, usuario, senha, isAdmin: isAdmin || false });
-        await novoUsuario.save();
-        res.status(201).json({ mensagem: "Usuário criado com sucesso!", id: novoUsuario._id });
-    } catch (err) {
-        res.status(500).json({ error: "Erro ao cadastrar: " + err.message });
-    }
-});
 
 router.post('/login', async (req, res) => {
     try {
         const { usuario, senha } = req.body;
-        const user = await Usuario.findOne({ usuario: usuario, senha: senha });
+        const user = await Usuario.findOne({ usuario: usuario, senha: senha }); 
+        
         if (user) {
-            return res.status(200).json({ id: user._id, nome: user.nome, usuario: user.usuario, isAdmin: user.isAdmin });
+            const token = jwt.sign(
+                { id: user._id, isAdmin: user.isAdmin }, 
+                process.env.JWT_SECRET || 'senha_provisoria_agape', 
+                { expiresIn: '12h' } 
+            );
+
+            return res.status(200).json({ 
+                id: user._id, 
+                nome: user.nome, 
+                usuario: user.usuario, 
+                isAdmin: user.isAdmin,
+                token: token 
+            });
         } else {
             return res.status(401).json({ error: "Usuário ou senha incorretos" });
         }
@@ -37,7 +42,18 @@ router.get('/users-full', async (req, res) => {
     }
 });
 
-router.put('/users/:id', async (req, res) => {
+router.post('/users', verificarToken, verificarAdmin, async (req, res) => {
+    try {
+        const { nome, email, usuario, senha, isAdmin } = req.body;
+        const novoUsuario = new Usuario({ nome, email, usuario, senha, isAdmin: isAdmin || false });
+        await novoUsuario.save();
+        res.status(201).json({ mensagem: "Usuário criado com sucesso!", id: novoUsuario._id });
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao cadastrar: " + err.message });
+    }
+});
+
+router.put('/users/:id', verificarToken, verificarAdmin, async (req, res) => {
     try {
         const { nome, email, usuario, senha, isAdmin } = req.body;
         const atualizacao = { nome, email, usuario, isAdmin };
@@ -51,7 +67,7 @@ router.put('/users/:id', async (req, res) => {
     }
 });
 
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', verificarToken, verificarAdmin, async (req, res) => {
     try {
         const idDoUsuario = req.params.id;
         await Frequencia.deleteMany({ usuarioId: idDoUsuario });
