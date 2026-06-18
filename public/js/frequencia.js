@@ -79,7 +79,7 @@ function renderTabelaUsuarios() {
         if (!mostrar) return;
 
         let statusRetiro = "-";
-        let corRetiro = "#888"; 
+        let classeRetiro = "retiro-vazio"; // Usa a classe do CSS
 
         if (totalEncontros === 0) {
             statusRetiro = "Sem encontros";
@@ -88,21 +88,21 @@ function renderTabelaUsuarios() {
             
             if (presencaPorcento >= 80) {
                 statusRetiro = "Vai";
-                corRetiro = "#1a9e5c"; 
+                classeRetiro = "retiro-vai"; 
             } else if (presencaPorcento >= 75) {
                 statusRetiro = "Quase não vai";
-                corRetiro = "#f57f17"; 
+                classeRetiro = "retiro-quase"; 
             } else {
                 statusRetiro = "Não vai";
-                corRetiro = "#dc3545"; 
+                classeRetiro = "retiro-nao"; 
             }
         }
 
-        tbody.innerHTML += `
+  tbody.innerHTML += `
             <tr>
                 <td>${user.nome}</td>
                 <td>${faltas}</td>
-                <td style="color: ${corRetiro}; font-weight: bold; text-transform: uppercase; font-size: 0.9em;">
+                <td class="status-retiro ${classeRetiro}">
                     ${statusRetiro}
                 </td>
                 <td><button class="editar" onclick="abrirModalUsuario('${user.nome}')">Editar</button></td>

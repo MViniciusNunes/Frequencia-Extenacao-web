@@ -148,3 +148,15 @@ h1 {
     text-align: center;
     color: #224bb8;
 }
+
+
+.status-retiro {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.retiro-vai { color: #1a9e5c; }       /* Verde */
+.retiro-quase { color: #f57f17; }     /* Laranja */
+.retiro-nao { color: #dc3545; }       /* Vermelho */
+.retiro-vazio { color: #888; }        /* Cinza */

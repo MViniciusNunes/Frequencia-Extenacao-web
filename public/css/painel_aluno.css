@@ -88,3 +88,13 @@
     display: table; /* Força a tabela a aparecer, já que no frequencia.css ela vem escondida */
     width: 100%;
 }
+
+
+.status-historico {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.status-presenca { color: #2e7d32; }    /* Verde */
+.status-falta { color: #c62828; }       /* Vermelho */
+.status-justificada { color: #f57f17; } /* Laranja */

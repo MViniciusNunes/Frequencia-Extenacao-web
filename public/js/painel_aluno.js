@@ -80,16 +80,18 @@ async function carregarMeuHistorico() {
             if (!registro.encontroId) return; 
 
             // Define a cor da linha dependendo do status
-            let corStatus = '#224bb8';
-            if (registro.status === 'P') corStatus = '#2e7d32'; // Verde
-            if (registro.status === 'F') corStatus = '#c62828'; // Vermelho
-            if (registro.status === 'FJ') corStatus = '#f57f17'; // Laranja
+        // Define a classe do CSS dependendo do status
+            let classeStatus = '';
+            if (registro.status === 'P') classeStatus = 'status-presenca'; 
+            if (registro.status === 'F') classeStatus = 'status-falta'; 
+            if (registro.status === 'FJ') classeStatus = 'status-justificada'; 
 
+            // Tabela limpa, usando as classes
             tbody.innerHTML += `
                 <tr>
                     <td>${registro.encontroId.data}</td>
                     <td>${registro.encontroId.nome}</td>
-                    <td style="color: ${corStatus}; font-weight: bold; font-size: 18px;">${registro.status}</td>
+                    <td class="status-historico ${classeStatus}">${registro.status}</td>
                 </tr>
             `;
         });
