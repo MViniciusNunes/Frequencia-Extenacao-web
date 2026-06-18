@@ -37,9 +37,13 @@ function renderTabelaUsuarios() {
         if (!user || !user.nome) return;
         if (termoBusca && !user.nome.toLowerCase().includes(termoBusca)) return;
 
+        const badgeAdmin = user.isAdmin
+            ? `<span class="badge-admin">Admin</span>`
+            : '';
+
         tbody.innerHTML += `
             <tr>
-                <td>${user.nome}</td>
+                <td>${user.nome} ${badgeAdmin}</td>
                 <td>
                     <button class="editar" onclick="abrirModalEdicao('${user._id}')">
                         Editar
@@ -57,10 +61,11 @@ if (inputPesquisa) {
 
 // ================= MODAL DE CRIAÇÃO =================
 function abrirModalCriacao() {
-    document.getElementById('criar-nome').value    = '';
-    document.getElementById('criar-email').value   = '';
-    document.getElementById('criar-usuario').value = '';
-    document.getElementById('criar-senha').value   = '';
+    document.getElementById('criar-nome').value      = '';
+    document.getElementById('criar-email').value     = '';
+    document.getElementById('criar-usuario').value   = '';
+    document.getElementById('criar-senha').value     = '';
+    document.getElementById('criar-isAdmin').checked = false;
 
     document.getElementById('modalCriar').style.display  = 'block';
     document.getElementById('overlay').style.display     = 'block';
@@ -71,6 +76,7 @@ async function criarUsuario() {
     const email   = document.getElementById('criar-email').value.trim();
     const usuario = document.getElementById('criar-usuario').value.trim();
     const senha   = document.getElementById('criar-senha').value.trim();
+    const isAdmin = document.getElementById('criar-isAdmin').checked;
 
     if (!nome || !email || !usuario || !senha) {
         alert("Por favor, preencha todos os campos.");
@@ -81,7 +87,7 @@ async function criarUsuario() {
         const response = await fetch('/api/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, email, usuario, senha })
+            body: JSON.stringify({ nome, email, usuario, senha, isAdmin })
         });
 
         if (response.ok) {
@@ -105,10 +111,11 @@ function abrirModalEdicao(id) {
 
     usuarioEditandoId = id;
 
-    document.getElementById('edit-nome').value    = user.nome    || '';
-    document.getElementById('edit-email').value   = user.email   || '';
-    document.getElementById('edit-usuario').value = user.usuario || '';
-    document.getElementById('edit-senha').value   = '';
+    document.getElementById('edit-nome').value       = user.nome    || '';
+    document.getElementById('edit-email').value      = user.email   || '';
+    document.getElementById('edit-usuario').value    = user.usuario || '';
+    document.getElementById('edit-senha').value      = '';
+    document.getElementById('edit-isAdmin').checked  = user.isAdmin || false;
 
     document.getElementById('modalUsuario').style.display = 'block';
     document.getElementById('overlay').style.display      = 'block';
@@ -129,14 +136,15 @@ async function salvarEdicao() {
     const email   = document.getElementById('edit-email').value.trim();
     const usuario = document.getElementById('edit-usuario').value.trim();
     const senha   = document.getElementById('edit-senha').value.trim();
+    const isAdmin = document.getElementById('edit-isAdmin').checked;
 
     if (!nome || !email || !usuario) {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;
     }
 
-    const payload = { nome, email, usuario };
-    if (senha) payload.senha = senha; // só envia senha se foi preenchida
+    const payload = { nome, email, usuario, isAdmin };
+    if (senha) payload.senha = senha;
 
     try {
         const response = await fetch(`/api/users/${usuarioEditandoId}`, {

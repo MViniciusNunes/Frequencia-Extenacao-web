@@ -5,6 +5,23 @@ const selectFiltro = document.getElementById('escolha');
 const tabelaUsuarios = document.querySelector('.tabela-usuarios');
 const tabelaFaltas   = document.querySelector('.tabela-faltas');
 
+// ================== UTILITÁRIO DE DATA ==================
+// Normaliza qualquer formato (ISO completo ou só data) para YYYY-MM-DD
+function normalizarData(dataStr) {
+    if (!dataStr) return dataStr;
+    // Se vier no formato ISO (ex: 2026-06-25T19:00:00Z), pega só a parte da data
+    return dataStr.toString().substring(0, 10);
+}
+
+// Formata YYYY-MM-DD para DD/MM/YYYY (mais legível)
+function formatarDataExibicao(dataStr) {
+    const d = normalizarData(dataStr);
+    if (!d || d.length < 10) return dataStr;
+    const [ano, mes, dia] = d.split('-');
+    return `${dia}/${mes}/${ano}`;
+}
+
+// ================== CONTAGENS ==================
 function contarFaltasPorUsuario(nome) {
     return Object.values(registros).filter(dia => dia[nome] === 'F').length;
 }
@@ -14,19 +31,16 @@ function contarFaltasPorData(data) {
     return Object.values(dia).filter(s => s === 'F').length;
 }
 
+// ================== RENDERIZAÇÃO ==================
 function renderTabelaUsuarios() {
     const tbody = document.getElementById('tbody-usuarios');
     if(!tbody) return;
     tbody.innerHTML = '';
 
-    // Pega o que está digitado no campo de pesquisa em tempo real
     const termoBusca = document.getElementById('nome').value.toLowerCase();
 
     usuarios.forEach(user => {
-        // Se a busca não for vazia e o nome não contiver a letra digitada, pula a criação da linha
-        if (termoBusca && !user.nome.toLowerCase().includes(termoBusca)) {
-            return; 
-        }
+        if (termoBusca && !user.nome.toLowerCase().includes(termoBusca)) return; 
 
         const faltas = contarFaltasPorUsuario(user.nome);
         tbody.innerHTML += `
@@ -45,18 +59,17 @@ function renderTabelaFaltas() {
 
     const termoBusca = document.getElementById('nome').value.toLowerCase();
 
-    Object.keys(registros).forEach(data => {
-        // Na visão por data, a pesquisa filtra pela data do encontro
-        if (termoBusca && !data.toLowerCase().includes(termoBusca)) {
-            return;
-        }
+    Object.keys(registros).forEach(dataKey => {
+        const dataExibicao = formatarDataExibicao(dataKey);
 
-        const faltas = contarFaltasPorData(data);
+        if (termoBusca && !dataExibicao.toLowerCase().includes(termoBusca)) return;
+
+        const faltas = contarFaltasPorData(dataKey);
         tbody.innerHTML += `
             <tr>
-                <td>${data}</td>
+                <td>${dataExibicao}</td>
                 <td>${faltas} falta(s)</td>
-                <td><button class="editar" onclick="abrirModalData('${data}')">Editar</button></td>
+                <td><button class="editar" onclick="abrirModalData('${dataKey}')">Editar</button></td>
             </tr>`;
     });
 }
@@ -75,13 +88,21 @@ function atualizarTabelas() {
     }
 }
 
+// ================== CARGA DE DADOS ==================
 async function carregarDadosIniciais() {
     try {
         const respUsers = await fetch('/api/users');
         usuarios = await respUsers.json(); 
 
         const respFreq = await fetch('/api/frequencias-completas');
-        registros = await respFreq.json();       
+        const rawRegistros = await respFreq.json();
+
+        // Normaliza todas as chaves de data para YYYY-MM-DD antes de guardar
+        registros = {};
+        Object.keys(rawRegistros).forEach(dataKey => {
+            const dataNormalizada = normalizarData(dataKey);
+            registros[dataNormalizada] = rawRegistros[dataKey];
+        });
         
         atualizarTabelas(); 
     } catch (error) {
@@ -93,7 +114,6 @@ if (selectFiltro) {
     selectFiltro.addEventListener('change', atualizarTabelas);
 }
 
-// Gatilho da barra de pesquisa: atualiza a tabela a cada letra digitada
 const inputPesquisa = document.getElementById('nome');
 if (inputPesquisa) {
     inputPesquisa.addEventListener('input', atualizarTabelas);
@@ -111,35 +131,36 @@ function abrirModalUsuario(nome) {
     const lista = document.getElementById('modal-usuario-lista');
     lista.innerHTML = '';
 
-    Object.keys(registros).forEach(data => {
-        const statusAtual = registros[data][nome] || 'P';
+    Object.keys(registros).forEach(dataKey => {
+        const statusAtual = registros[dataKey][nome] || 'P';
+        const dataExibicao = formatarDataExibicao(dataKey);
         lista.innerHTML += `
             <div class="usuario-item">
-                <p>${data}</p>
-                <select data-data="${data}">
-                    <option ${statusAtual === 'P'  ? 'selected' : ''}>P</option>
-                    <option ${statusAtual === 'F'  ? 'selected' : ''}>F</option>
-                    <option ${statusAtual === 'FJ' ? 'selected' : ''}>FJ</option>
+                <p>${dataExibicao}</p>
+                <select data-data="${dataKey}">
+                    <option value="P"  ${statusAtual === 'P'  ? 'selected' : ''}>P</option>
+                    <option value="F"  ${statusAtual === 'F'  ? 'selected' : ''}>F</option>
+                    <option value="FJ" ${statusAtual === 'FJ' ? 'selected' : ''}>FJ</option>
                 </select>
             </div>`;
     });
     document.getElementById('modalUsuario').style.display = 'block';
 }
 
-function abrirModalData(data) {
-    dataAtiva = data;
-    document.getElementById('modal-data-titulo').textContent = data;
+function abrirModalData(dataKey) {
+    dataAtiva = dataKey;
+    document.getElementById('modal-data-titulo').textContent = formatarDataExibicao(dataKey);
     const lista = document.getElementById('modal-data-lista');
     lista.innerHTML = '';
 
     usuarios.forEach(user => {
-        const statusAtual = (registros[data] && registros[data][user.nome]) || 'P';
+        const statusAtual = (registros[dataKey] && registros[dataKey][user.nome]) || 'P';
         lista.innerHTML += `
             <div class="usuario-item">
                 <p>${user.nome}</p>
                 <select data-id="${user._id}" data-nome="${user.nome}">
-                    <option value="P" ${statusAtual === 'P' ? 'selected' : ''}>P</option>
-                    <option value="F" ${statusAtual === 'F' ? 'selected' : ''}>F</option>
+                    <option value="P"  ${statusAtual === 'P'  ? 'selected' : ''}>P</option>
+                    <option value="F"  ${statusAtual === 'F'  ? 'selected' : ''}>F</option>
                     <option value="FJ" ${statusAtual === 'FJ' ? 'selected' : ''}>FJ</option>
                 </select>
             </div>`;
@@ -153,56 +174,43 @@ function fecharModal() {
 }
 
 // ================== FUNÇÕES DE SALVAR ==================
-
-// 1. Salva quando você edita a partir da visão "Por Data"
 async function salvarModalData() {
-    // Captura todos os <select> (caixinhas de P/F/FJ) de dentro do modal
     const selects = document.querySelectorAll('#modal-data-lista select');
     
-    // Dispara a atualização no banco para cada aluno listado
     const promessas = Array.from(selects).map(select => {
-        const nomeDoAluno = select.getAttribute('data-nome');
-        const statusSelecionado = select.value;
-
         return fetch('/api/atualizar-frequencia', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                nome: nomeDoAluno,
-                data: dataAtiva, // Usa a variável global que diz qual data estamos editando
-                status: statusSelecionado
+                nome: select.getAttribute('data-nome'),
+                data: dataAtiva, // já está normalizado (YYYY-MM-DD)
+                status: select.value
             })
         });
     });
 
     try {
-        await Promise.all(promessas); // Espera o banco processar tudo
+        await Promise.all(promessas);
         alert("Frequência da data salva com sucesso!");
         fecharModal();
-        location.reload(); // Recarrega a página para você ver a tabela atualizada
+        location.reload();
     } catch (error) {
         console.error("Erro ao salvar:", error);
         alert("Ocorreu um erro ao salvar as alterações.");
     }
 }
 
-// 2. Salva quando você edita a partir da visão "Por Usuário"
 async function salvarModalUsuario() {
-    // Captura todos os <select> de dentro do modal
     const selects = document.querySelectorAll('#modal-usuario-lista select');
     
-    // Dispara a atualização no banco para cada data listada
     const promessas = Array.from(selects).map(select => {
-        const dataDoEncontro = select.getAttribute('data-data');
-        const statusSelecionado = select.value;
-
         return fetch('/api/atualizar-frequencia', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                nome: usuarioAtivo, // Usa a variável global que diz qual aluno estamos editando
-                data: dataDoEncontro,
-                status: statusSelecionado
+                nome: usuarioAtivo,
+                data: select.getAttribute('data-data'), // já normalizado
+                status: select.value
             })
         });
     });

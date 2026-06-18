@@ -158,6 +158,68 @@ button.editar {
     background: #224bb8;
 }
 
+/* Toggle switch Admin */
+.campo-toggle {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    cursor: pointer;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #ccc;
+    border-radius: 26px;
+    transition: 0.3s;
+}
+
+.slider::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggle input:checked + .slider {
+    background: #224bb8;
+}
+
+.toggle input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+/* Badge Admin na tabela */
+.badge-admin {
+    display: inline-block;
+    background: #224bb8;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
 button.btn-criar {
     background: #1a9e5c;
     font-weight: bold;

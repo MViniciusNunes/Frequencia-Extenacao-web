@@ -232,4 +232,39 @@ router.put('/users/:id', async (req, res) => {
     }
 });
 
+// ===== Rota para Buscar Usuários Completos (com todos os campos para o modal de edição) =====
+router.get('/users-full', async (req, res) => {
+    try {
+        // Retorna todos os campos EXCETO a senha
+        const usuarios = await Usuario.find({}, '-senha');
+        res.json(usuarios);
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
+});
+
+// ===== Rota para Atualizar Usuário =====
+router.put('/users/:id', async (req, res) => {
+    try {
+        const { nome, email, usuario, senha, isAdmin } = req.body;
+
+        const atualizacao = { nome, email, usuario, isAdmin };
+        if (senha) atualizacao.senha = senha;
+
+        const usuarioAtualizado = await Usuario.findByIdAndUpdate(
+            req.params.id,
+            atualizacao,
+            { new: true, runValidators: true }
+        );
+
+        if (!usuarioAtualizado) {
+            return res.status(404).json({ erro: "Usuário não encontrado." });
+        }
+
+        res.status(200).json({ mensagem: "Usuário atualizado com sucesso!", usuario: usuarioAtualizado });
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao atualizar: " + err.message });
+    }
+});
+
 module.exports = router;
