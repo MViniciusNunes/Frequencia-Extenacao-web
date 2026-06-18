@@ -1,14 +1,8 @@
-// ==========================================
-// ESTADO GLOBAL DO SISTEMA
-// ==========================================
 let usuarios = []; 
 let registros = {}; 
 let usuarioAtivo = null;
 let dataAtivaId = null;
 
-// ==========================================
-// UTILITÁRIOS DE DATA
-// ==========================================
 function normalizarData(dataStr) {
     if (!dataStr) return dataStr;
     return dataStr.toString().substring(0, 10);
@@ -21,9 +15,6 @@ function formatarDataExibicao(dataStr) {
     return `${dia}/${mes}/${ano}`;
 }
 
-// ==========================================
-// CONTAGENS E LÓGICA DE NEGÓCIO
-// ==========================================
 function contarFaltasPorUsuario(nome) {
     let faltas = 0;
     Object.keys(registros).forEach(encId => {

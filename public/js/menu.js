@@ -5,15 +5,12 @@ function abrirUsuarios() {
 
 }
 
-
-
 function gerarQR() {
 
     window.location.href =
         "configurar_frequencia.html";
 
 }
-
 
 
 function apagarDados() {

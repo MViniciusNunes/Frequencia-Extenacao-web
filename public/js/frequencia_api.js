@@ -1,6 +1,3 @@
-// ==========================================
-// COMUNICAÇÃO COM O SERVIDOR (FETCH)
-// ==========================================
 async function carregarDadosIniciais() {
     try {
         const respUsers = await fetch('/api/users-full');

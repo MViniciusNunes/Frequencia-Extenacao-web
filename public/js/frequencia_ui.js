@@ -1,6 +1,3 @@
-// ==========================================
-// ELEMENTOS VISUAIS E MODAIS
-// ==========================================
 const selectFiltro = document.getElementById('escolha');
 const tabelaUsuarios = document.querySelector('.tabela-usuarios');
 const tabelaFaltas   = document.querySelector('.tabela-faltas');
@@ -178,9 +175,6 @@ function fecharModal() {
     document.getElementById('modalData').style.display    = 'none';
 }
 
-// ==========================================
-// INICIALIZAÇÃO DA TELA
-// ==========================================
 if (selectFiltro) selectFiltro.addEventListener('change', atualizarTabelas);
 const inputPesquisa = document.getElementById('nome');
 if (inputPesquisa) inputPesquisa.addEventListener('input', atualizarTabelas);

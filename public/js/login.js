@@ -22,10 +22,6 @@ async function entrar() {
             
             sessionStorage.setItem('usuarioLogado', JSON.stringify(dadosDoUsuario));
 
-            // ==========================================
-            // BIFURCAÇÃO À PROVA DE FALHAS
-            // Agora ele aceita tanto o Booleano quanto o Texto "true"
-            // ==========================================
             if (dadosDoUsuario.isAdmin === true || String(dadosDoUsuario.isAdmin).toLowerCase() === "true") {
                 window.location.href = 'menu.html';
             } else {

@@ -1,4 +1,3 @@
-// 1. Verifica quem está logado ao abrir a página
 const usuarioString = sessionStorage.getItem('usuarioLogado');
 if (!usuarioString) {
     window.location.href = 'login.html'; 
@@ -7,9 +6,6 @@ if (!usuarioString) {
 const usuarioAtivo = JSON.parse(usuarioString);
 document.getElementById('boas-vindas').textContent = `Olá, ${usuarioAtivo.nome}!`;
 
-// ==========================================
-// MÁGICA DE UX: ADAPTA O BOTÃO SE FOR ADMIN
-// ==========================================
 const btnAcao = document.getElementById('btn-acao-topo');
 if (usuarioAtivo.isAdmin === true || String(usuarioAtivo.isAdmin).toLowerCase() === "true") {
     btnAcao.textContent = 'Voltar ao Menu';
@@ -17,9 +13,6 @@ if (usuarioAtivo.isAdmin === true || String(usuarioAtivo.isAdmin).toLowerCase() 
     btnAcao.onclick = () => { window.location.href = 'menu.html'; }; 
 }
 
-// ==========================================
-// FUNÇÃO 1: REGISTRAR PRESENÇA PELO CÓDIGO
-// ==========================================
 async function registrarPorCodigo() {
     const input = document.getElementById('codigo-encontro');
     const codigo = input.value.trim().toUpperCase();
@@ -54,11 +47,6 @@ async function registrarPorCodigo() {
     }
 }
 
-// ==========================================
-// FUNÇÃO 2: CARREGAR HISTÓRICO, PLACAR E MENSAGEM
-// ==========================================
-
-// Função auxiliar para formatar a data
 function formatarDataExibicao(dataStr) {
     if (!dataStr) return dataStr;
     const d = dataStr.toString().substring(0, 10);
@@ -87,15 +75,12 @@ async function carregarMeuHistorico() {
             const enc = registros[encId];
             if (!enc || !enc.info) return;
 
-            // Lógica Pessimista: Se o aluno não tem registro, ele ganha falta (F)
             const status = (enc.alunos && enc.alunos[usuarioAtivo.nome]) ? enc.alunos[usuarioAtivo.nome] : 'F';
 
-            // Conta os totais para o placar superior
             if (status === 'P') totalP++;
             if (status === 'F') totalF++;
             if (status === 'FJ') totalFJ++;
 
-            // Define a classe do CSS dependendo do status
             let classeStatus = 'status-falta'; 
             if (status === 'P') classeStatus = 'status-presenca'; 
             if (status === 'FJ') classeStatus = 'status-justificada'; 
@@ -112,7 +97,6 @@ async function carregarMeuHistorico() {
             `;
         });
 
-        // Atualiza os números nos quadros superiores
         const elP = document.getElementById('qtd-p');
         const elF = document.getElementById('qtd-f');
         const elFJ = document.getElementById('qtd-fj');
@@ -121,9 +105,6 @@ async function carregarMeuHistorico() {
         if (elF) elF.textContent = totalF;
         if (elFJ) elFJ.textContent = totalFJ;
 
-        // =======================================================
-        // MÁGICA DE ENGAJAMENTO: BANNER DO RETIRO
-        // =======================================================
         const banner = document.getElementById('banner-retiro');
         const titulo = document.getElementById('titulo-retiro');
         const mensagem = document.getElementById('mensagem-retiro');
@@ -162,13 +143,9 @@ async function carregarMeuHistorico() {
     }
 }
 
-// ==========================================
-// FUNÇÃO 3: SAIR (LOGOUT)
-// ==========================================
 function sair() {
     sessionStorage.removeItem('usuarioLogado');
     window.location.href = 'login.html';
 }
 
-// Inicia buscando as faltas/presenças assim que a tela abre
 carregarMeuHistorico();

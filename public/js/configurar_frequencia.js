@@ -1,11 +1,5 @@
-// ══════════════════════════════════════
-// DADOS (array — substituir por DB futuramente)
-// ══════════════════════════════════════
 const frequencias = JSON.parse(sessionStorage.getItem('frequencias') || '[]');
 
-// ──────────────────────────────────────
-// Gera código único estilo "KS8596L"
-// ──────────────────────────────────────
 function gerarCodigo() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
@@ -15,12 +9,6 @@ function gerarCodigo() {
     return code;
 }
 
-// ──────────────────────────────────────
-// GERAR — valida, salva e vai para tela 2
-// ──────────────────────────────────────
-// ──────────────────────────────────────
-// GERAR — valida, salva no BD e vai para tela 2
-// ──────────────────────────────────────
 async function irParaQR() {
     const nome  = document.getElementById('input-nome').value.trim();
     const tipo  = document.getElementById('input-tipo').value;
@@ -36,7 +24,6 @@ async function irParaQR() {
     const registro = { codigo, nome, tipo, data, descricao };
 
     try {
-        // Dispara os dados para a rota no back-end
         const response = await fetch('/api/encontros', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -44,7 +31,6 @@ async function irParaQR() {
         });
 
         if (response.ok) {
-            // Guarda o registroAtual na sessão apenas para a próxima tela conseguir exibir o QR Code
             sessionStorage.setItem('registroAtual', JSON.stringify(registro));
             window.location.href = 'frequencia_qrcode.html';
         } else {
@@ -56,9 +42,7 @@ async function irParaQR() {
     }
 }
 
-// ──────────────────────────────────────
-// CANCELAR — limpa os campos
-// ──────────────────────────────────────
+
 function cancelar() {
     document.getElementById('input-nome').value    = '';
     document.getElementById('input-tipo').value    = '';
@@ -68,10 +52,6 @@ function cancelar() {
     window.location.href = 'menu.html';
 }
 
-// ──────────────────────────────────────
-// Se voltou da tela 2 via "Editar",
-// restaura os dados que estavam preenchidos
-// ──────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
     const rascunho = JSON.parse(sessionStorage.getItem('rascunho') || 'null');
     if (rascunho) {

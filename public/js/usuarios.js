@@ -1,10 +1,9 @@
 let listaUsuarios = [];
 let usuarioEditandoId = null;
 
-// ================= BUSCA DE DADOS =================
 async function carregarUsuarios() {
     try {
-        const response = await fetch('/api/users-full'); // rota que retorna todos os campos
+        const response = await fetch('/api/users-full'); 
         listaUsuarios = await response.json();
 
         console.log("Dados recebidos da base de dados:", listaUsuarios);
@@ -20,7 +19,6 @@ async function carregarUsuarios() {
     }
 }
 
-// ================= RENDERIZAR TABELA =================
 function renderTabelaUsuarios() {
     const tbody = document.getElementById('tbody-usuarios');
     const tabelaInteira = document.querySelector('.tabela-usuarios');
@@ -53,13 +51,11 @@ function renderTabelaUsuarios() {
     });
 }
 
-// ================= GATILHO DA PESQUISA =================
 const inputPesquisa = document.getElementById('nome');
 if (inputPesquisa) {
     inputPesquisa.addEventListener('input', renderTabelaUsuarios);
 }
 
-// ================= MODAL DE CRIAÇÃO =================
 function abrirModalCriacao() {
     document.getElementById('criar-nome').value      = '';
     document.getElementById('criar-email').value     = '';
@@ -128,7 +124,6 @@ function fecharModal() {
     usuarioEditandoId = null;
 }
 
-// ================= SALVAR EDIÇÃO =================
 async function salvarEdicao() {
     if (!usuarioEditandoId) return;
 
@@ -167,7 +162,6 @@ async function salvarEdicao() {
     }
 }
 
-// ================= EXCLUIR (VIA MODAL) =================
 async function confirmarExclusaoModal() {
     if (!usuarioEditandoId) return;
 

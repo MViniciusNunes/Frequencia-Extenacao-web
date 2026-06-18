@@ -7,7 +7,6 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-// Inicializa o banco de dados
 conectarDB();
 
 app.get("/", (req, res) => {
