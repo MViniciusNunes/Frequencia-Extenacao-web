@@ -6,11 +6,12 @@
     <title>Painel do Aluno</title>
     <link rel="stylesheet" href="css/frequencia.css"> 
     <link rel="stylesheet" href="css/painel_aluno.css"> 
+    
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
 
 <main class="usuarios">
-    
     <div style="text-align: center; margin-bottom: 20px;">
         <img src="images/logo.png" alt="Logo Ágape" style="max-width: 120px;">
     </div>
@@ -20,19 +21,12 @@
         <button id="btn-acao-topo" class="cancelar" onclick="sair()" style="cursor: pointer;">Sair</button>
     </div>
 
-    <div id="banner-retiro" class="banner-retiro banner-vazio">
-        <h3 id="titulo-retiro" style="margin: 0 0 5px 0;">Status do Retiro</h3>
-        <p id="mensagem-retiro" style="margin: 0; font-size: 1.1em;">Calculando presença...</p>
-    </div>
-    
     <div class="card-presenca">
         <h2 class="titulo-aluno" style="margin-top: 0;">Registrar Presença</h2>
         
-        <div class="camera-placeholder">
-            <p style="margin: 0;">📸 Câmera (Em Breve)</p>
-        </div>
+        <div id="leitor-camera" style="width: 100%; max-width: 400px; margin: 0 auto 15px auto; overflow: hidden; border-radius: 12px; border: 2px dashed #ccc;"></div>
 
-        <p>Ou digite o código do encontro fornecido pelo professor:</p>
+        <p>Aponte a câmera para o QR Code ou digite o código manualmente:</p>
         <div class="container-input-codigo">
             <input type="text" id="codigo-encontro" class="meu-input input-codigo" placeholder="Ex: KS8596L">
             <button class="editar" onclick="registrarPorCodigo()">Confirmar</button>
@@ -41,17 +35,22 @@
 
     <div class="placar-container">
         <div class="placar-card card-p">
-            <h3 class="placar-titulo texto-p">Presenças (P)</h3>
+            <h3 class="placar-titulo texto-p">Presenças</h3>
             <h2 id="qtd-p" class="placar-numero texto-p">0</h2>
         </div>
         <div class="placar-card card-f">
-            <h3 class="placar-titulo texto-f">Faltas (F)</h3>
+            <h3 class="placar-titulo texto-f">Faltas</h3>
             <h2 id="qtd-f" class="placar-numero texto-f">0</h2>
         </div>
         <div class="placar-card card-fj">
-            <h3 class="placar-titulo texto-fj">Justificadas (FJ)</h3>
+            <h3 class="placar-titulo texto-fj">Justificadas</h3>
             <h2 id="qtd-fj" class="placar-numero texto-fj">0</h2>
         </div>
+    </div>
+
+    <div id="banner-retiro" class="banner-retiro banner-vazio">
+        <h3 id="titulo-retiro" style="margin: 0 0 5px 0;">Status do Retiro</h3>
+        <p id="mensagem-retiro" style="margin: 0; font-size: 1.1em;">Calculando presença...</p>
     </div>
 
     <table class="tabela-historico">
@@ -63,9 +62,8 @@
             </tr>
         </thead>
         <tbody id="tbody-historico">
-            </tbody>
+        </tbody>
     </table>
-
 </main>
 
 <script src="js/painel_aluno.js"></script>

@@ -1,4 +1,3 @@
-
 function formatarData(valor) {
     if (!valor) return '';
     const [ano, mes, dia] = valor.split('-');
@@ -13,8 +12,8 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const { codigo, nome, tipo, data, descr } = registro;
-    const conteudoQR = `https://www.google.com`;
+    // CORREÇÃO: O QR Code agora tem APENAS o código puro para a câmera do aluno conseguir ler!
+    const conteudoQR = registro.codigo;
 
     new QRCode(document.getElementById('qrcode'), {
         text: conteudoQR,
@@ -25,35 +24,43 @@ window.addEventListener('DOMContentLoaded', () => {
         correctLevel: QRCode.CorrectLevel.H
     });
 
-    document.getElementById('exibir-code').textContent = codigo;
+    document.getElementById('exibir-code').textContent = registro.codigo;
     document.getElementById('qr-info-texto').textContent =
-        `${nome} · ${tipo} · ${formatarData(data)}`;
+        `${registro.nome} · ${registro.tipo} · ${formatarData(registro.data)}`;
 });
 
 function voltarEditar() {
     const registro = JSON.parse(sessionStorage.getItem('registroAtual') || 'null');
-
     if (registro) {
         sessionStorage.setItem('rascunho', JSON.stringify(registro));
-
-        const frequencias = JSON.parse(sessionStorage.getItem('frequencias') || '[]');
-        frequencias.pop();
-        sessionStorage.setItem('frequencias', JSON.stringify(frequencias));
         sessionStorage.removeItem('registroAtual');
     }
-
+    // Volta sem salvar nada no banco! 
     window.location.href = 'configurar_frequencia.html';
 }
 
-function concluir() {
+// O "Concluir" é que finalmente salva no Banco de Dados!
+async function concluir() {
     const registro = JSON.parse(sessionStorage.getItem('registroAtual') || 'null');
-    const frequencias = JSON.parse(sessionStorage.getItem('frequencias') || '[]');
+    
+    if (!registro) return;
 
-    console.log('Frequência concluída:', registro);
-    console.log('Todas as frequências:', frequencias);
+    try {
+        const response = await fetch('/api/encontros', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(registro)
+        });
 
-    alert(`Frequência "${registro?.codigo}" salva com sucesso!`);
-
-    sessionStorage.removeItem('registroAtual');
-    window.location.href = 'configurar_frequencia.html';
+        if (response.ok) {
+            alert(`Frequência "${registro.codigo}" criada com sucesso no sistema!`);
+            sessionStorage.removeItem('registroAtual');
+            window.location.href = 'menu.html';
+        } else {
+            alert('Erro ao salvar o encontro no banco de dados.');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro de conexão com o servidor.');
+    }
 }

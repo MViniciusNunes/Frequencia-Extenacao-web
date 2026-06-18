@@ -149,3 +149,32 @@ function sair() {
 }
 
 carregarMeuHistorico();
+
+// ==========================================
+// FUNÇÃO 4: LIGAR A CÂMERA E LER QR CODE
+// ==========================================
+function iniciarCamera() {
+    // Inicia o leitor apontando para a div "leitor-camera"
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+        "leitor-camera",
+        { fps: 10, qrbox: { width: 250, height: 250 } }, 
+        false
+    );
+
+    html5QrcodeScanner.render((textoDecodificado) => {
+        // 1. O celular achou o código! Preenche o input
+        document.getElementById('codigo-encontro').value = textoDecodificado;
+        
+        // 2. Para a câmera para não ler repetido
+        html5QrcodeScanner.clear();
+        
+        // 3. Aperta o botão "Confirmar" virtualmente
+        registrarPorCodigo();
+
+    }, (erroLeitura) => {
+        // Ignora erros normais enquanto a câmera foca
+    });
+}
+
+// Inicia a câmera assim que a página carrega
+iniciarCamera();
