@@ -1,6 +1,3 @@
-// ══════════════════════════════════════
-// Lê o registro gerado na tela 1
-// ══════════════════════════════════════
 
 function formatarData(valor) {
     if (!valor) return '';

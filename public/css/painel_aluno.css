@@ -98,3 +98,19 @@
 .status-presenca { color: #2e7d32; }    /* Verde */
 .status-falta { color: #c62828; }       /* Vermelho */
 .status-justificada { color: #f57f17; } /* Laranja */
+
+/* ================= BANNER DO RETIRO ================= */
+.banner-retiro {
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.3s;
+}
+
+.banner-vai { background-color: #1a9e5c; }    /* Verde */
+.banner-quase { background-color: #f57f17; }  /* Laranja */
+.banner-nao { background-color: #dc3545; }    /* Vermelho */
+.banner-vazio { background-color: #888; }     /* Cinza */
