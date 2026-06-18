@@ -3,66 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frequência</title>
+    <title>Gerenciar Usuários</title>
+    <link rel="stylesheet" href="css/frequencia.css"> 
     <link rel="stylesheet" href="css/usuarios.css">
 </head>
 <body>
 
 <main class="usuarios">
 
-    <div class="filtro">
-        <input type="text" class="meu-input" id="nome" placeholder="Pesquisar usuário">
-        <select id="escolha" class="meu-input" title="Escolha uma opção">
-            <option value="opcao1">Nome</option>
-            <option value="opcao2">Data</option>
-        </select>
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px; width: 100%;">
+        <button class="editar" onclick="window.location.href='menu.html'" style="cursor: pointer; padding: 8px 20px;">Voltar</button>
     </div>
 
-    <!-- Tabela: Nome / Faltas -->
+    <div class="filtro">
+        <input type="text" class="meu-input" id="nome" placeholder="Pesquisar usuário por nome...">
+    </div>
+
     <table class="tabela-usuarios">
         <thead>
             <tr>
                 <th>Nome</th>
-                <th>Faltas</th>
                 <th>Ações</th>
             </tr>
         </thead>
-        <tbody id="tbody-usuarios"></tbody>
-    </table>
-
-    <!-- Tabela: Data / Faltas -->
-    <table class="tabela-faltas">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Faltas</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody id="tbody-faltas"></tbody>
+        <tbody id="tbody-usuarios">
+            </tbody>
     </table>
 
 </main>
-
-<!-- Modal: Editar faltas de um usuário (lista de datas) -->
-<div id="modalUsuario" class="modal">
-    <h2 id="modal-usuario-titulo"></h2>
-    <div class="lista-rolagem" id="modal-usuario-lista"></div>
-    <div class="botoes-edicao">
-        <button onclick="salvarModalUsuario()">Salvar</button>
-        <button class="cancelar" onclick="fecharModal()">Cancelar</button>
-    </div>
-</div>
-
-<!-- Modal: Editar presenças de uma data (lista de usuários) -->
-<div id="modalData" class="modal">
-    <h2 id="modal-data-titulo"></h2>
-    <div class="lista-rolagem" id="modal-data-lista"></div>
-    <div class="botoes-edicao">
-        <button onclick="salvarModalData()">Salvar</button>
-        <button class="cancelar" onclick="fecharModal()">Cancelar</button>
-    </div>
-</div>
 
 <script src="js/usuarios.js"></script>
 </body>

@@ -82,35 +82,6 @@ router.get('/users', async (req, res) => {
     }
 });
 
-// No seu api.js (Servidor)
-router.get('/frequencias-completas', async (req, res) => {
-    try {
-        const docs = await Frequencia.find()
-            .populate('usuarioId', 'nome')
-            .populate('encontroId', 'data'); 
-        
-        console.log("Total de documentos encontrados:", docs.length); // ADICIONE ISSO
-        
-        const formatado = {};
-        // ... (resto do código)
-        
-        docs.forEach(doc => {
-            if (doc.encontroId && doc.usuarioId) {
-                // Converte para string YYYY-MM-DD para garantir compatibilidade
-                const dataString = new Date(doc.encontroId.data).toISOString().split('T')[0];
-                const nome = doc.usuarioId.nome;
-                
-                if (!formatado[dataString]) formatado[dataString] = {};
-                formatado[dataString][nome] = doc.status;
-            }
-        });
-        
-        res.json(formatado);
-    } catch (err) {
-        res.status(500).json({ erro: err.message });
-    }
-});
-
 
 // ===== Rota para Criar Encontro (Frequência) =====
 router.post('/encontros', async (req, res) => {
@@ -131,6 +102,17 @@ router.post('/encontros', async (req, res) => {
         res.status(201).json({ mensagem: "Encontro criado com sucesso!", encontro: novoEncontro });
     } catch (err) {
         res.status(500).json({ error: "Erro ao criar encontro: " + err.message });
+    }
+});
+
+// ===== Rota para Deletar Usuário =====
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const idDoUsuario = req.params.id;
+        await Usuario.findByIdAndDelete(idDoUsuario);
+        res.status(200).json({ mensagem: "Usuário excluído com sucesso" });
+    } catch (err) {
+        res.status(500).json({ erro: "Erro ao excluir: " + err.message });
     }
 });
 

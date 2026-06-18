@@ -18,7 +18,16 @@ function renderTabelaUsuarios() {
     const tbody = document.getElementById('tbody-usuarios');
     if(!tbody) return;
     tbody.innerHTML = '';
+
+    // Pega o que está digitado no campo de pesquisa em tempo real
+    const termoBusca = document.getElementById('nome').value.toLowerCase();
+
     usuarios.forEach(user => {
+        // Se a busca não for vazia e o nome não contiver a letra digitada, pula a criação da linha
+        if (termoBusca && !user.nome.toLowerCase().includes(termoBusca)) {
+            return; 
+        }
+
         const faltas = contarFaltasPorUsuario(user.nome);
         tbody.innerHTML += `
             <tr>
@@ -33,7 +42,15 @@ function renderTabelaFaltas() {
     const tbody = document.getElementById('tbody-faltas');
     if(!tbody) return;
     tbody.innerHTML = '';
+
+    const termoBusca = document.getElementById('nome').value.toLowerCase();
+
     Object.keys(registros).forEach(data => {
+        // Na visão por data, a pesquisa filtra pela data do encontro
+        if (termoBusca && !data.toLowerCase().includes(termoBusca)) {
+            return;
+        }
+
         const faltas = contarFaltasPorData(data);
         tbody.innerHTML += `
             <tr>
@@ -75,6 +92,13 @@ async function carregarDadosIniciais() {
 if (selectFiltro) {
     selectFiltro.addEventListener('change', atualizarTabelas);
 }
+
+// Gatilho da barra de pesquisa: atualiza a tabela a cada letra digitada
+const inputPesquisa = document.getElementById('nome');
+if (inputPesquisa) {
+    inputPesquisa.addEventListener('input', atualizarTabelas);
+}
+
 carregarDadosIniciais();
 
 // ================== MODAIS ==================
@@ -126,4 +150,70 @@ function abrirModalData(data) {
 function fecharModal() {
     document.getElementById('modalUsuario').style.display = 'none';
     document.getElementById('modalData').style.display    = 'none';
+}
+
+// ================== FUNÇÕES DE SALVAR ==================
+
+// 1. Salva quando você edita a partir da visão "Por Data"
+async function salvarModalData() {
+    // Captura todos os <select> (caixinhas de P/F/FJ) de dentro do modal
+    const selects = document.querySelectorAll('#modal-data-lista select');
+    
+    // Dispara a atualização no banco para cada aluno listado
+    const promessas = Array.from(selects).map(select => {
+        const nomeDoAluno = select.getAttribute('data-nome');
+        const statusSelecionado = select.value;
+
+        return fetch('/api/atualizar-frequencia', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nome: nomeDoAluno,
+                data: dataAtiva, // Usa a variável global que diz qual data estamos editando
+                status: statusSelecionado
+            })
+        });
+    });
+
+    try {
+        await Promise.all(promessas); // Espera o banco processar tudo
+        alert("Frequência da data salva com sucesso!");
+        fecharModal();
+        location.reload(); // Recarrega a página para você ver a tabela atualizada
+    } catch (error) {
+        console.error("Erro ao salvar:", error);
+        alert("Ocorreu um erro ao salvar as alterações.");
+    }
+}
+
+// 2. Salva quando você edita a partir da visão "Por Usuário"
+async function salvarModalUsuario() {
+    // Captura todos os <select> de dentro do modal
+    const selects = document.querySelectorAll('#modal-usuario-lista select');
+    
+    // Dispara a atualização no banco para cada data listada
+    const promessas = Array.from(selects).map(select => {
+        const dataDoEncontro = select.getAttribute('data-data');
+        const statusSelecionado = select.value;
+
+        return fetch('/api/atualizar-frequencia', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nome: usuarioAtivo, // Usa a variável global que diz qual aluno estamos editando
+                data: dataDoEncontro,
+                status: statusSelecionado
+            })
+        });
+    });
+
+    try {
+        await Promise.all(promessas);
+        alert("Frequência do aluno salva com sucesso!");
+        fecharModal();
+        location.reload(); 
+    } catch (error) {
+        console.error("Erro ao salvar:", error);
+        alert("Ocorreu um erro ao salvar as alterações.");
+    }
 }
