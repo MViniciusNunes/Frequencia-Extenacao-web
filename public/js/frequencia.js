@@ -91,18 +91,12 @@ function atualizarTabelas() {
 // ================== CARGA DE DADOS ==================
 async function carregarDadosIniciais() {
     try {
-        const respUsers = await fetch('/api/users');
+        // CORREÇÃO: Atualizado para a nova rota do backend
+        const respUsers = await fetch('/api/users-full');
         usuarios = await respUsers.json(); 
 
         const respFreq = await fetch('/api/frequencias-completas');
-        const rawRegistros = await respFreq.json();
-
-        // Normaliza todas as chaves de data para YYYY-MM-DD antes de guardar
-        registros = {};
-        Object.keys(rawRegistros).forEach(dataKey => {
-            const dataNormalizada = normalizarData(dataKey);
-            registros[dataNormalizada] = rawRegistros[dataKey];
-        });
+        registros = await respFreq.json();       
         
         atualizarTabelas(); 
     } catch (error) {

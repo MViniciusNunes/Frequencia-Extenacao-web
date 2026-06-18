@@ -1,76 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-br">
     <head>
-
         <meta charset="UTF-8">
         <title>Administrador</title>
-        <link
-            rel="stylesheet"
-            href="css/menu.css">
-
+        <link rel="stylesheet" href="css/menu.css">
     </head>
-
     <body>
+
+        <button onclick="window.location.href='painel_aluno.html'" style="position: absolute; top: 20px; left: 20px; background-color: #224bb8; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            👤 Minha Frequência
+        </button>
 
         <main class="dashboard">
 
-            <img
-                src="images/logo.png"
-                class="logo">
+            <img src="images/logo.png" class="logo">
 
             <h1> Painel Administrativo</h1>
             <button class="cancelar" onclick="sair()" style="cursor: pointer;">Sair</button>
 
-                <section class="cards">
+            <section class="cards">
 
-            <div class="card">
+                <div class="card">
+                    <h2> Frequência</h2>
+                    <p> Gerenciar faltas </p>
+                    <button onclick="abrirUsuarios()">
+                        Abrir
+                    </button>
+                </div>
 
-                <h2> Frequência</h2>
+                <div class="card">
+                    <h2>Gerar QR</h2>
+                    <p> Novo encontro </p>
+                    <button onclick="gerarQR()">
+                        Gerar
+                    </button>
+                </div>
 
-                <p>
-                    Gerenciar faltas
-                </p>
+                <div class="card">
+                    <h2> Usuário </h2>
+                    <p> Gerencia Usuarios </p>
+                    <button onclick="apagarDados()">
+                        Gerenciar
+                    </button>
+                </div>
 
-                <button onclick="abrirUsuarios()">
-                    Abrir
-                </button>
-
-            </div>
-
-
-            <div class="card">
-
-                <h2>Gerar QR</h2>
-
-                <p>
-                    Novo encontro
-                </p>
-
-                <button onclick="gerarQR()">
-                    Gerar
-                </button>
-
-            </div>
-
-
-            <div class="card">
-
-                <h2>
-                    Usuário
-                </h2>
-
-                <p>
-                    Gerencia Usuarios
-                </p>
-
-                <button onclick="apagarDados()">
-                    Gerenciar
-                </button>
-
-            </div>
-
-        </section>
+            </section>
         </main>
-     <script src="js/menu.js"></script>
+        
+        <script src="js/menu.js"></script>
     </body>
 </html>

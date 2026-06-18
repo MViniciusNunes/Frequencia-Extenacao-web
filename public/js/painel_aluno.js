@@ -1,12 +1,22 @@
 // 1. Verifica quem está logado ao abrir a página
 const usuarioString = sessionStorage.getItem('usuarioLogado');
 if (!usuarioString) {
-    // Se tentar acessar direto sem fazer login, é expulso
     window.location.href = 'login.html'; 
 }
 
 const usuarioAtivo = JSON.parse(usuarioString);
 document.getElementById('boas-vindas').textContent = `Olá, ${usuarioAtivo.nome}!`;
+
+// ==========================================
+// MÁGICA DE UX: ADAPTA O BOTÃO SE FOR ADMIN
+// ==========================================
+const btnAcao = document.getElementById('btn-acao-topo');
+// Checa se a pessoa logada é Administradora (garantindo proteção para texto ou booleano)
+if (usuarioAtivo.isAdmin === true || String(usuarioAtivo.isAdmin).toLowerCase() === "true") {
+    btnAcao.textContent = 'Voltar ao Menu';
+    btnAcao.className = 'editar'; // Muda do botão vermelho(cancelar) para o azul(editar)
+    btnAcao.onclick = () => { window.location.href = 'menu.html'; }; // Altera a rota para o menu
+}
 
 // ==========================================
 // FUNÇÃO 1: REGISTRAR PRESENÇA PELO CÓDIGO
