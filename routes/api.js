@@ -1,74 +1,75 @@
-// routes/api.js
 const express = require('express');
 const router = express.Router();
+const Encontro = require('../models/Encontros'); // Ajuste o nome do arquivo conforme necessário
+const Frequencia = require('../models/frequencias');
 const Usuario = require('../models/Usuario');
 
-// Criar novo usuário (Cadastro)
-router.post('/users', async (req, res) => {
+// --- CRUD DE ENCONTROS ---
+router.post('/encontros', async (req, res) => {
     try {
-        const { nome, email, usuario, senha } = req.body;
-        const novoUsuario = await Usuario.create({ nome, email, usuario, senha });
-        res.status(201).json(novoUsuario);
+        const novoEncontro = await Encontro.create(req.body);
+        res.status(201).json(novoEncontro);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 });
 
-// Listar todos os usuários
+// --- CRUD DE PRESENÇA (Salvar P, F, FJ) ---
+router.post('/frequencia', async (req, res) => {
+    try {
+        const { encontroId, usuarioId, status } = req.body;
+        
+        // Se já existe, atualiza; se não, cria (upsert)
+        const registro = await Frequencia.findOneAndUpdate(
+            { encontroId, usuarioId },
+            { status },
+            { new: true, upsert: true }
+        );
+        res.status(200).json(registro);
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
+});
+
+// GET: Buscar usuários para exibir no modal
 router.get('/users', async (req, res) => {
     try {
-        const usuarios = await Usuario.find().select('-senha'); // Retorna tudo, exceto as senhas
+        const usuarios = await Usuario.find({}, 'nome'); // Traz apenas os nomes para a lista
         res.json(usuarios);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 });
 
-// Atualizar usuário
-router.put('/:id', async (req, res) => {
+// No seu api.js (Servidor)
+router.get('/frequencias-completas', async (req, res) => {
     try {
-        const { nome, email } = req.body;
-        const usuarioAtualizado = await Usuario.findByIdAndUpdate(
-            req.params.id, 
-            { nome, email }, 
-            { new: true }
-        );
-        res.json(usuarioAtualizado);
+        const docs = await Frequencia.find()
+            .populate('usuarioId', 'nome')
+            .populate('encontroId', 'data'); 
+        
+        console.log("Total de documentos encontrados:", docs.length); // ADICIONE ISSO
+        
+        const formatado = {};
+        // ... (resto do código)
+        
+        docs.forEach(doc => {
+            if (doc.encontroId && doc.usuarioId) {
+                // Converte para string YYYY-MM-DD para garantir compatibilidade
+                const dataString = new Date(doc.encontroId.data).toISOString().split('T')[0];
+                const nome = doc.usuarioId.nome;
+                
+                if (!formatado[dataString]) formatado[dataString] = {};
+                formatado[dataString][nome] = doc.status;
+            }
+        });
+        
+        res.json(formatado);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 });
 
-// Deletar usuário
-router.delete('/:id', async (req, res) => {
-    try {
-        await Usuario.findByIdAndDelete(req.params.id);
-        res.sendStatus(204);
-    } catch (err) {
-        res.status(500).json({ erro: err.message });
-    }
-});
-
-// ===== Rota de login
-
-// ===== Rota de login =====
-router.post('/login', async (req, res) => {
-    try {
-        const { usuario, senha } = req.body;
-
-        // O Mongoose busca um documento que tenha exatamente esse usuário e senha
-        const user = await Usuario.findOne({ usuario: usuario, senha: senha });
-
-        if (user) {
-            // Retorna os dados do usuário se encontrar
-            return res.status(200).json({ id: user._id, nome: user.nome, usuario: user.usuario });
-        } else {
-            return res.status(401).json({ error: "Usuário ou senha incorretos" });
-        }
-    } catch (err) {
-        return res.status(500).json({ error: "Erro interno no servidor: " + err.message });
-    }
-});
 
 
 module.exports = router;

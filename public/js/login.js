@@ -41,7 +41,7 @@ function entrar() {
             if (data.usuario === "admin") {
                 window.location.href = "menu.html";
             } else {
-                window.location.href = "camera.html";
+                window.location.href = "menu.html";
             }
         })
         .catch(error => {

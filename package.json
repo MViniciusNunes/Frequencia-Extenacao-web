@@ -16,5 +16,13 @@
     "express": "^5.2.1",
     "mongodb": "^7.3.0",
     "mongoose": "^9.7.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MViniciusNunes/Frequencia-Extenacao-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MViniciusNunes/Frequencia-Extenacao-web/issues"
+  },
+  "homepage": "https://github.com/MViniciusNunes/Frequencia-Extenacao-web#readme"
 }

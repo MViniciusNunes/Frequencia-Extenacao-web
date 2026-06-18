@@ -1,7 +1,7 @@
 function abrirUsuarios() {
 
     window.location.href =
-        "usuarios.html";
+        "frequencia.html";
 
 }
 
@@ -9,9 +9,8 @@ function abrirUsuarios() {
 
 function gerarQR() {
 
-    alert(
-        "QR Code gerado com sucesso!"
-    );
+    window.location.href =
+        "configurar_frequencia.html";
 
 }
 
@@ -19,19 +18,7 @@ function gerarQR() {
 
 function apagarDados() {
 
-    const confirmar =
-
-        confirm(
-            "Tem certeza que deseja apagar todos os dados?"
-        );
-
-
-    if (confirmar) {
-
-        alert(
-            "Dados removidos."
-        );
-
-    }
+  window.location.href =
+        "usuarios.html";
 
 }
