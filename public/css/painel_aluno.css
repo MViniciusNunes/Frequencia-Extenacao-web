@@ -1,0 +1,90 @@
+
+.header-aluno {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.titulo-aluno {
+    margin: 0;
+    color: #224bb8;
+}
+
+/* Card central de Registro de Presença */
+.card-presenca {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.camera-placeholder {
+    width: 150px;
+    height: 150px;
+    background: #eee;
+    border: 2px dashed #ccc;
+    border-radius: 15px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+}
+
+.container-input-codigo {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.input-codigo {
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Placares de Frequência */
+.placar-container {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.placar-card {
+    flex: 1;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.placar-titulo {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.placar-numero {
+    font-size: 36px;
+    margin: 10px 0 0 0;
+}
+
+/* Cores específicas de cada Placar */
+.card-p { background: #e8f5e9; }
+.texto-p { color: #2e7d32; } /* Verde */
+
+.card-f { background: #ffebee; }
+.texto-f { color: #c62828; } /* Vermelho */
+
+.card-fj { background: #fff8e1; }
+.texto-fj { color: #f57f17; } /* Laranja */
+
+/* Tabela do Aluno */
+.tabela-historico {
+    display: table; /* Força a tabela a aparecer, já que no frequencia.css ela vem escondida */
+    width: 100%;
+}

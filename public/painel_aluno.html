@@ -5,45 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Aluno</title>
     <link rel="stylesheet" href="css/frequencia.css"> 
+    <link rel="stylesheet" href="css/painel_aluno.css"> 
 </head>
 <body>
 
 <main class="usuarios">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h1 id="boas-vindas" style="margin: 0; color: #224bb8;">Olá, Servo!</h1>
+    
+    <div class="header-aluno">
+        <h1 id="boas-vindas" class="titulo-aluno">Olá, Aluno!</h1>
         <button class="cancelar" onclick="sair()" style="cursor: pointer;">Sair</button>
     </div>
 
-    <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.08); margin-bottom: 30px; text-align: center;">
-        <h2 style="color: #224bb8; margin-top: 0;">Registrar Presença</h2>
+    <div class="card-presenca">
+        <h2 class="titulo-aluno" style="margin-top: 0;">Registrar Presença</h2>
         
-        <div style="width: 150px; height: 150px; background: #eee; border: 2px dashed #ccc; border-radius: 15px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; color: #888;">
+        <div class="camera-placeholder">
             <p style="margin: 0;">📸 Câmera (Em Breve)</p>
         </div>
 
         <p>Ou digite o código do encontro fornecido pelo professor:</p>
-        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
-            <input type="text" id="codigo-encontro" class="meu-input" placeholder="Ex: KS8596L" style="text-transform: uppercase; text-align: center; font-weight: bold; font-size: 18px;">
+        <div class="container-input-codigo">
+            <input type="text" id="codigo-encontro" class="meu-input input-codigo" placeholder="Ex: KS8596L">
             <button class="editar" onclick="registrarPorCodigo()">Confirmar</button>
         </div>
     </div>
 
-    <div style="display: flex; gap: 20px; justify-content: space-between; margin-bottom: 30px;">
-        <div style="flex: 1; background: #e8f5e9; padding: 20px; border-radius: 15px; text-align: center;">
-            <h3 style="color: #2e7d32; margin: 0;">Presenças (P)</h3>
-            <h2 id="qtd-p" style="font-size: 36px; margin: 10px 0 0 0; color: #2e7d32;">0</h2>
+    <div class="placar-container">
+        <div class="placar-card card-p">
+            <h3 class="placar-titulo texto-p">Presenças (P)</h3>
+            <h2 id="qtd-p" class="placar-numero texto-p">0</h2>
         </div>
-        <div style="flex: 1; background: #ffebee; padding: 20px; border-radius: 15px; text-align: center;">
-            <h3 style="color: #c62828; margin: 0;">Faltas (F)</h3>
-            <h2 id="qtd-f" style="font-size: 36px; margin: 10px 0 0 0; color: #c62828;">0</h2>
+        <div class="placar-card card-f">
+            <h3 class="placar-titulo texto-f">Faltas (F)</h3>
+            <h2 id="qtd-f" class="placar-numero texto-f">0</h2>
         </div>
-        <div style="flex: 1; background: #fff8e1; padding: 20px; border-radius: 15px; text-align: center;">
-            <h3 style="color: #f57f17; margin: 0;">Justificadas (FJ)</h3>
-            <h2 id="qtd-fj" style="font-size: 36px; margin: 10px 0 0 0; color: #f57f17;">0</h2>
+        <div class="placar-card card-fj">
+            <h3 class="placar-titulo texto-fj">Justificadas (FJ)</h3>
+            <h2 id="qtd-fj" class="placar-numero texto-fj">0</h2>
         </div>
     </div>
 
-    <table style="display: table;">
+    <table class="tabela-historico">
         <thead>
             <tr>
                 <th>Data</th>
