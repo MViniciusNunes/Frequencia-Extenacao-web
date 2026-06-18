@@ -2,18 +2,71 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frequência - QR Code</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="css/frequencia.css">
+    
+    <style>
+        /* Centralização exclusiva para criar o design de Cartão do QR Code */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f6; /* Fundo levemente cinza para destacar o cartão */
+            margin: 0;
+        }
+        
+        #tela-qr {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .qr-corpo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        #qrcode-container {
+            background: #fff;
+            padding: 15px;
+            border: 2px dashed #ccc;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .qr-code-valor {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #224bb8;
+            letter-spacing: 3px;
+            margin-top: 10px;
+        }
+
+        .rodape-botoes {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
 <div id="tela-qr">
-
     <div class="cabecalho">
-        <h1>Frequência</h1>
         <div class="logo-placeholder">  
-            <img src="images/logo.png" alt="Logo"></div>
+            <img src="images/logo.png" alt="Logo" style="max-width: 120px; margin-bottom: 10px;">
+        </div>
+        <h1 style="color: #224bb8; margin: 0;">Código de Acesso</h1>
     </div>
 
     <div class="qr-corpo">
@@ -22,18 +75,17 @@
         </div>
 
         <div class="qr-code-label">
-            <span>Code:</span><br>
+            <span style="color: #666;">Forneça este código:</span><br>
             <div class="qr-code-valor" id="exibir-code"></div>
         </div>
 
-        <p class="qr-info" id="qr-info-texto"></p>
+        <p class="qr-info" id="qr-info-texto" style="color: #888; font-size: 0.9rem; margin-top: 15px;"></p>
     </div>
 
     <div class="rodape-botoes">
-        <button class="btn btn-editar" onclick="voltarEditar()">Editar</button>
-        <button class="btn btn-concluir" onclick="concluir()">Concluir</button>
+        <button class="cancelar" onclick="voltarEditar()">Voltar</button>
+        <button class="editar" onclick="concluir()">Concluir</button>
     </div>
-
 </div>
 
 <script src="js/qrcode_view.js"></script>

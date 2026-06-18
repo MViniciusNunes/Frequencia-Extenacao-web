@@ -18,17 +18,17 @@ function formatarDataExibicao(dataStr) {
     return `${dia}/${mes}/${ano}`;
 }
 
-// ================== CONTAGENS ==================
+// ================== CONTAGENS (ATUALIZADAS PARA ID E ESTRUTURA NOVA) ==================
 function contarFaltasPorUsuario(nome) {
-    return Object.values(registros).filter(dia => dia[nome] === 'F').length;
+    return Object.values(registros).filter(enc => enc.alunos && enc.alunos[nome] === 'F').length;
 }
 
-function contarFaltasPorData(data) {
-    const dia = registros[data] || {};
-    return Object.values(dia).filter(s => s === 'F').length;
+function contarFaltasPorEncontro(encId) {
+    const enc = registros[encId];
+    if (!enc || !enc.alunos) return 0;
+    return Object.values(enc.alunos).filter(s => s === 'F').length;
 }
 
-// ================== RENDERIZAÇÃO INTELIGENTE ==================
 // ================== RENDERIZAÇÃO INTELIGENTE ==================
 function renderTabelaUsuarios() {
     const tbody = document.getElementById('tbody-usuarios');
@@ -39,7 +39,6 @@ function renderTabelaUsuarios() {
     const regexNumerico = /^(>=|<=|>|<|=)?\s*(\d+)$/;
     const matchNumerico = termoBusca.match(regexNumerico);
 
-    // MÁGICA 1: Descobre quantos encontros no total o sistema já teve
     const totalEncontros = Object.keys(registros).length;
 
     usuarios.forEach(user => {
@@ -63,27 +62,24 @@ function renderTabelaUsuarios() {
 
         if (!mostrar) return;
 
-        // =======================================================
-        // MÁGICA 2: Calculadora de Elegibilidade para o Retiro
-        // =======================================================
+        // Calculadora de Elegibilidade para o Retiro
         let statusRetiro = "-";
-        let corRetiro = "#888"; // Cinza padrão
+        let corRetiro = "#888"; 
 
         if (totalEncontros === 0) {
             statusRetiro = "Sem encontros";
         } else {
-            // Calcula a porcentagem de presença real do aluno
             const presencaPorcento = ((totalEncontros - faltas) / totalEncontros) * 100;
             
             if (presencaPorcento >= 80) {
                 statusRetiro = "Vai";
-                corRetiro = "#1a9e5c"; // Verde (Seguro)
+                corRetiro = "#1a9e5c"; 
             } else if (presencaPorcento >= 75) {
                 statusRetiro = "Quase não vai";
-                corRetiro = "#f57f17"; // Laranja (No limite)
+                corRetiro = "#f57f17"; 
             } else {
                 statusRetiro = "Não vai";
-                corRetiro = "#dc3545"; // Vermelho (Reprovado por falta)
+                corRetiro = "#dc3545"; 
             }
         }
 
@@ -108,9 +104,14 @@ function renderTabelaFaltas() {
     const regexNumerico = /^(>=|<=|>|<|=)?\s*(\d+)$/;
     const matchNumerico = termoBusca.match(regexNumerico);
 
-    Object.keys(registros).forEach(dataKey => {
-        const dataExibicao = formatarDataExibicao(dataKey);
-        const faltas = contarFaltasPorData(dataKey);
+    Object.keys(registros).forEach(encId => {
+        const enc = registros[encId];
+        
+        if (!enc || !enc.info) return;
+
+        const dataExibicao = `${formatarDataExibicao(enc.info.data)} - ${enc.info.nome || 'Encontro'}`;
+        const faltas = contarFaltasPorEncontro(encId);
+
         let mostrar = true;
 
         if (termoBusca) {
@@ -134,7 +135,7 @@ function renderTabelaFaltas() {
             <tr>
                 <td>${dataExibicao}</td>
                 <td>${faltas} falta(s)</td>
-                <td><button class="editar" onclick="abrirModalData('${dataKey}')">Editar</button></td>
+                <td><button class="editar" onclick="abrirModalData('${encId}')">Editar</button></td>
             </tr>`;
     });
 }
@@ -160,13 +161,7 @@ async function carregarDadosIniciais() {
         usuarios = await respUsers.json(); 
 
         const respFreq = await fetch('/api/frequencias-completas');
-        const rawRegistros = await respFreq.json();
-
-        registros = {};
-        Object.keys(rawRegistros).forEach(dataKey => {
-            const dataNormalizada = normalizarData(dataKey);
-            registros[dataNormalizada] = rawRegistros[dataKey];
-        });
+        registros = await respFreq.json(); // Agora pegamos direto, sem modificar a chave (usa o ID)
         
         atualizarTabelas(); 
     } catch (error) {
@@ -187,7 +182,7 @@ carregarDadosIniciais();
 
 // ================== MODAIS ==================
 let usuarioAtivo = null;
-let dataAtiva = null;
+let dataAtivaId = null;
 
 function abrirModalUsuario(nome) {
     usuarioAtivo = nome;
@@ -195,15 +190,17 @@ function abrirModalUsuario(nome) {
     const lista = document.getElementById('modal-usuario-lista');
     lista.innerHTML = '';
 
-    Object.keys(registros).forEach(dataKey => {
-        const statusAtual = registros[dataKey][nome] || 'P';
-        const dataExibicao = formatarDataExibicao(dataKey);
+    Object.keys(registros).forEach(encId => {
+        const enc = registros[encId];
+        if (!enc || !enc.info) return; 
         
-        // MÁGICA 1: Inserimos o atributo data-original para memorizar o valor inicial
+        const statusAtual = (enc.alunos && enc.alunos[nome]) ? enc.alunos[nome] : 'P';
+        const dataExibicao = `${formatarDataExibicao(enc.info.data)} - ${enc.info.nome || 'Encontro'}`;
+        
         lista.innerHTML += `
             <div class="usuario-item">
                 <p>${dataExibicao}</p>
-                <select data-data="${dataKey}" data-original="${statusAtual}">
+                <select data-id="${encId}" data-original="${statusAtual}">
                     <option value="P"  ${statusAtual === 'P'  ? 'selected' : ''}>P</option>
                     <option value="F"  ${statusAtual === 'F'  ? 'selected' : ''}>F</option>
                     <option value="FJ" ${statusAtual === 'FJ' ? 'selected' : ''}>FJ</option>
@@ -213,20 +210,22 @@ function abrirModalUsuario(nome) {
     document.getElementById('modalUsuario').style.display = 'block';
 }
 
-function abrirModalData(dataKey) {
-    dataAtiva = dataKey;
-    document.getElementById('modal-data-titulo').textContent = formatarDataExibicao(dataKey);
+function abrirModalData(encId) {
+    dataAtivaId = encId;
+    const enc = registros[encId];
+    if (!enc || !enc.info) return; 
+    
+    document.getElementById('modal-data-titulo').textContent = `${formatarDataExibicao(enc.info.data)} - ${enc.info.nome || 'Encontro'}`;
     const lista = document.getElementById('modal-data-lista');
     lista.innerHTML = '';
 
     usuarios.forEach(user => {
-        const statusAtual = (registros[dataKey] && registros[dataKey][user.nome]) || 'P';
+        const statusAtual = (enc.alunos && enc.alunos[user.nome]) ? enc.alunos[user.nome] : 'P';
         
-        // MÁGICA 1: Inserimos o atributo data-original para memorizar o valor inicial
         lista.innerHTML += `
             <div class="usuario-item">
                 <p>${user.nome}</p>
-                <select data-id="${user._id}" data-nome="${user.nome}" data-original="${statusAtual}">
+                <select data-nome="${user.nome}" data-original="${statusAtual}">
                     <option value="P"  ${statusAtual === 'P'  ? 'selected' : ''}>P</option>
                     <option value="F"  ${statusAtual === 'F'  ? 'selected' : ''}>F</option>
                     <option value="FJ" ${statusAtual === 'FJ' ? 'selected' : ''}>FJ</option>
@@ -244,8 +243,6 @@ function fecharModal() {
 // ================== FUNÇÕES DE SALVAR ==================
 async function salvarModalData() {
     const selects = document.querySelectorAll('#modal-data-lista select');
-    
-    // MÁGICA 2: Filtra a lista, separando APENAS os selects que o administrador alterou
     const alterados = Array.from(selects).filter(s => s.value !== s.getAttribute('data-original'));
 
     if (alterados.length === 0) {
@@ -254,14 +251,13 @@ async function salvarModalData() {
         return;
     }
 
-    // Cria as requisições apenas para quem foi modificado
     const promessas = alterados.map(select => {
         return fetch('/api/atualizar-frequencia', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 nome: select.getAttribute('data-nome'),
-                data: dataAtiva, 
+                encontroId: dataAtivaId, 
                 status: select.value
             })
         });
@@ -269,8 +265,6 @@ async function salvarModalData() {
 
     try {
         const respostas = await Promise.all(promessas);
-        
-        // MÁGICA 3: Se o banco de dados falhar (retornar algo diferente de 200 OK), ele avisa!
         const comErro = respostas.filter(r => !r.ok);
         
         if (comErro.length > 0) {
@@ -289,7 +283,6 @@ async function salvarModalData() {
 
 async function salvarModalUsuario() {
     const selects = document.querySelectorAll('#modal-usuario-lista select');
-    
     const alterados = Array.from(selects).filter(s => s.value !== s.getAttribute('data-original'));
 
     if (alterados.length === 0) {
@@ -304,7 +297,7 @@ async function salvarModalUsuario() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 nome: usuarioAtivo,
-                data: select.getAttribute('data-data'), 
+                encontroId: select.getAttribute('data-id'), 
                 status: select.value
             })
         });
