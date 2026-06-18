@@ -28,9 +28,8 @@ body {
     width: 200px;
 }
 
-/* Tabelas: escondidas por padrão — o JS controla */
-.tabela-usuarios,
-.tabela-faltas {
+/* Tabela: escondida por padrão — o JS controla */
+.tabela-usuarios {
     display: none;
 }
 
@@ -60,65 +59,79 @@ tr:hover {
     background: #f8fbff;
 }
 
-/* Modais */
+/* ===================== MODAL ===================== */
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 999;
+}
+
 .modal {
     display: none;
     position: fixed;
-    top: 20%;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     background: white;
-    padding: 20px 20px 70px 20px;
-    border: 1px solid #ccc;
-    border-radius: 15px;
+    padding: 28px 28px 80px 28px;
+    border-radius: 16px;
     z-index: 1000;
-    width: 300px;
-    min-height: 200px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    width: 340px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
 }
 
 .modal h2 {
     margin-top: 0;
+    margin-bottom: 20px;
     color: #224bb8;
+    font-size: 1.2rem;
 }
 
-/* Lista com scroll dentro do modal */
-.lista-rolagem {
-    max-height: 200px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    padding-right: 10px;
-}
-
-/* Item: nome à esquerda, select à direita */
-.usuario-item {
+/* Campos do modal */
+.campo-modal {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
 }
 
-.usuario-item p {
-    margin: 0;
+.campo-modal label {
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #444;
 }
 
-.usuario-item select {
-    padding: 4px 8px;
+.label-opcional {
+    font-weight: normal;
+    color: #888;
+    font-size: 0.78rem;
+}
+
+.input-modal {
+    border: 1px solid #ddd;
     border-radius: 8px;
-    border: 1px solid #ccc;
-    cursor: pointer;
+    padding: 9px 12px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-modal:focus {
+    border-color: #224bb8;
 }
 
 /* Botões do modal */
 .botoes-edicao {
     position: absolute;
-    bottom: 15px;
-    right: 15px;
+    bottom: 18px;
+    right: 18px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    align-items: center;
 }
 
 /* Botões gerais */
@@ -130,6 +143,7 @@ button {
     border-radius: 10px;
     cursor: pointer;
     transition: opacity 0.2s;
+    font-size: 0.9rem;
 }
 
 button:hover {
@@ -137,11 +151,22 @@ button:hover {
 }
 
 button.cancelar {
-    background: #d9534f;
+    background: #888;
 }
 
 button.editar {
     background: #224bb8;
+}
+
+button.btn-criar {
+    background: #1a9e5c;
+    font-weight: bold;
+    padding: 8px 20px;
+}
+
+button.btn-excluir {
+    background: #dc3545;
+    padding: 10px 14px;
 }
 
 h1 {

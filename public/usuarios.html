@@ -11,7 +11,8 @@
 
 <main class="usuarios">
 
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px; width: 100%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; width: 100%;">
+        <button class="btn-criar" onclick="abrirModalCriacao()">+ Criar Usuário</button>
         <button class="editar" onclick="window.location.href='menu.html'" style="cursor: pointer; padding: 8px 20px;">Voltar</button>
     </div>
 
@@ -27,10 +28,67 @@
             </tr>
         </thead>
         <tbody id="tbody-usuarios">
-            </tbody>
+        </tbody>
     </table>
 
 </main>
+
+<!-- Modal: Editar usuário -->
+<div id="modalUsuario" class="modal">
+    <h2>Editar Usuário</h2>
+
+    <div class="campo-modal">
+        <label>Nome</label>
+        <input type="text" id="edit-nome" class="input-modal" placeholder="Nome completo">
+    </div>
+    <div class="campo-modal">
+        <label>E-mail</label>
+        <input type="email" id="edit-email" class="input-modal" placeholder="E-mail">
+    </div>
+    <div class="campo-modal">
+        <label>Usuário</label>
+        <input type="text" id="edit-usuario" class="input-modal" placeholder="Nome de usuário">
+    </div>
+    <div class="campo-modal">
+        <label>Nova Senha <span class="label-opcional">(deixe em branco para manter)</span></label>
+        <input type="password" id="edit-senha" class="input-modal" placeholder="••••••••">
+    </div>
+
+    <div class="botoes-edicao">
+        <button class="btn-excluir" onclick="confirmarExclusaoModal()">Excluir</button>
+        <button class="cancelar" onclick="fecharModal()">Cancelar</button>
+        <button onclick="salvarEdicao()">Salvar</button>
+    </div>
+</div>
+
+<!-- Modal: Criar usuário -->
+<div id="modalCriar" class="modal">
+    <h2>Novo Usuário</h2>
+
+    <div class="campo-modal">
+        <label>Nome</label>
+        <input type="text" id="criar-nome" class="input-modal" placeholder="Nome completo">
+    </div>
+    <div class="campo-modal">
+        <label>E-mail</label>
+        <input type="email" id="criar-email" class="input-modal" placeholder="E-mail">
+    </div>
+    <div class="campo-modal">
+        <label>Usuário</label>
+        <input type="text" id="criar-usuario" class="input-modal" placeholder="Nome de usuário">
+    </div>
+    <div class="campo-modal">
+        <label>Senha</label>
+        <input type="password" id="criar-senha" class="input-modal" placeholder="••••••••">
+    </div>
+
+    <div class="botoes-edicao">
+        <button class="cancelar" onclick="fecharModal()">Cancelar</button>
+        <button onclick="criarUsuario()">Criar</button>
+    </div>
+</div>
+
+<div id="overlay" class="overlay" onclick="fecharModal()"></div>
 
 <script src="js/usuarios.js"></script>
 </body>

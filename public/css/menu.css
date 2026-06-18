@@ -10,6 +10,14 @@ font-family:Arial;
 
 }
 
+button.cancelar {
+    background: #d9534f;
+    position: fixed; /* Fixa o elemento na tela */
+    top: 20px;       /* Distância do topo */
+    right: 20px;     /* Distância da direita */
+    z-index: 1000;   /* Garante que ele fique por cima de outros elementos */
+}
+
 .dashboard{
 
 max-width:1200px;
