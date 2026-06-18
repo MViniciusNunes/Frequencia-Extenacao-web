@@ -50,29 +50,30 @@ router.post('/login', async (req, res) => {
 router.get('/frequencias-completas', async (req, res) => {
     try {
         const encontros = await Encontro.find();
-        const frequencias = await Frequencia.find()
-            .populate('usuarioId', 'nome')
-            .populate('encontroId', 'data'); 
-        
+        const frequencias = await Frequencia.find().populate('usuarioId', 'nome').populate('encontroId');
+
         const formatado = {};
-        
+
         encontros.forEach(enc => {
-            const dataString = enc.data;
-            if (dataString && !formatado[dataString]) {
-                formatado[dataString] = {};
-            }
+            const idStr = enc._id.toString();
+            // Agora a chave principal é o ID do encontro, não a data!
+            formatado[idStr] = {
+                info: { data: enc.data, nome: enc.nome },
+                alunos: {}
+            };
         });
-        
+
         frequencias.forEach(doc => {
             if (doc.encontroId && doc.usuarioId) {
-                const dataString = doc.encontroId.data; 
+                const idStr = doc.encontroId._id ? doc.encontroId._id.toString() : doc.encontroId.toString();
                 const nome = doc.usuarioId.nome;
-                
-                if (!formatado[dataString]) formatado[dataString] = {};
-                formatado[dataString][nome] = doc.status;
+
+                if (formatado[idStr]) {
+                    formatado[idStr].alunos[nome] = doc.status;
+                }
             }
         });
-        
+
         res.json(formatado);
     } catch (err) {
         res.status(500).json({ erro: err.message });
@@ -82,21 +83,22 @@ router.get('/frequencias-completas', async (req, res) => {
 // ===== Rota para Atualizar Frequência Manualmente =====
 router.put('/atualizar-frequencia', async (req, res) => {
     try {
-        const { nome, data, status } = req.body;
-        
+        // Recebe o encontroId ao invés da data
+        const { nome, encontroId, status } = req.body;
+
         const usuario = await Usuario.findOne({ nome: nome });
-        const encontro = await Encontro.findOne({ data: data });
-        
+        const encontro = await Encontro.findById(encontroId);
+
         if (!usuario || !encontro) {
             return res.status(404).json({ erro: "Usuário ou Encontro não encontrado." });
         }
-        
+
         const registro = await Frequencia.findOneAndUpdate(
             { encontroId: encontro._id, usuarioId: usuario._id },
             { status: status },
-            { new: true, upsert: true } 
+            { new: true, upsert: true }
         );
-        
+
         res.status(200).json(registro);
     } catch (err) {
         res.status(500).json({ erro: err.message });

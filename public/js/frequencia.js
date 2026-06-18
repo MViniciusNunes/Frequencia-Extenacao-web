@@ -29,16 +29,18 @@ function contarFaltasPorData(data) {
 }
 
 // ================== RENDERIZAÇÃO INTELIGENTE ==================
+// ================== RENDERIZAÇÃO INTELIGENTE ==================
 function renderTabelaUsuarios() {
     const tbody = document.getElementById('tbody-usuarios');
     if(!tbody) return;
     tbody.innerHTML = '';
 
     const termoBusca = document.getElementById('nome').value.toLowerCase().trim();
-    
-    // REGEX: Verifica se a pessoa digitou algo como ">5", "<=3" ou apenas "5"
     const regexNumerico = /^(>=|<=|>|<|=)?\s*(\d+)$/;
     const matchNumerico = termoBusca.match(regexNumerico);
+
+    // MÁGICA 1: Descobre quantos encontros no total o sistema já teve
+    const totalEncontros = Object.keys(registros).length;
 
     usuarios.forEach(user => {
         const faltas = contarFaltasPorUsuario(user.nome);
@@ -46,8 +48,7 @@ function renderTabelaUsuarios() {
 
         if (termoBusca) {
             if (matchNumerico) {
-                // Lógica de filtro matemático (por quantidade de faltas)
-                const operador = matchNumerico[1] || '='; // Se digitar só "5", assume que é "=5"
+                const operador = matchNumerico[1] || '='; 
                 const valorFiltro = parseInt(matchNumerico[2], 10);
                 
                 if (operador === '>') mostrar = faltas > valorFiltro;
@@ -56,17 +57,43 @@ function renderTabelaUsuarios() {
                 else if (operador === '<=') mostrar = faltas <= valorFiltro;
                 else if (operador === '=') mostrar = faltas === valorFiltro;
             } else {
-                // Lógica de filtro normal por texto
                 mostrar = user.nome.toLowerCase().includes(termoBusca);
             }
         }
 
         if (!mostrar) return;
 
+        // =======================================================
+        // MÁGICA 2: Calculadora de Elegibilidade para o Retiro
+        // =======================================================
+        let statusRetiro = "-";
+        let corRetiro = "#888"; // Cinza padrão
+
+        if (totalEncontros === 0) {
+            statusRetiro = "Sem encontros";
+        } else {
+            // Calcula a porcentagem de presença real do aluno
+            const presencaPorcento = ((totalEncontros - faltas) / totalEncontros) * 100;
+            
+            if (presencaPorcento >= 80) {
+                statusRetiro = "Vai";
+                corRetiro = "#1a9e5c"; // Verde (Seguro)
+            } else if (presencaPorcento >= 75) {
+                statusRetiro = "Quase não vai";
+                corRetiro = "#f57f17"; // Laranja (No limite)
+            } else {
+                statusRetiro = "Não vai";
+                corRetiro = "#dc3545"; // Vermelho (Reprovado por falta)
+            }
+        }
+
         tbody.innerHTML += `
             <tr>
                 <td>${user.nome}</td>
                 <td>${faltas}</td>
+                <td style="color: ${corRetiro}; font-weight: bold; text-transform: uppercase; font-size: 0.9em;">
+                    ${statusRetiro}
+                </td>
                 <td><button class="editar" onclick="abrirModalUsuario('${user.nome}')">Editar</button></td>
             </tr>`;
     });
@@ -171,10 +198,12 @@ function abrirModalUsuario(nome) {
     Object.keys(registros).forEach(dataKey => {
         const statusAtual = registros[dataKey][nome] || 'P';
         const dataExibicao = formatarDataExibicao(dataKey);
+        
+        // MÁGICA 1: Inserimos o atributo data-original para memorizar o valor inicial
         lista.innerHTML += `
             <div class="usuario-item">
                 <p>${dataExibicao}</p>
-                <select data-data="${dataKey}">
+                <select data-data="${dataKey}" data-original="${statusAtual}">
                     <option value="P"  ${statusAtual === 'P'  ? 'selected' : ''}>P</option>
                     <option value="F"  ${statusAtual === 'F'  ? 'selected' : ''}>F</option>
                     <option value="FJ" ${statusAtual === 'FJ' ? 'selected' : ''}>FJ</option>
@@ -192,10 +221,12 @@ function abrirModalData(dataKey) {
 
     usuarios.forEach(user => {
         const statusAtual = (registros[dataKey] && registros[dataKey][user.nome]) || 'P';
+        
+        // MÁGICA 1: Inserimos o atributo data-original para memorizar o valor inicial
         lista.innerHTML += `
             <div class="usuario-item">
                 <p>${user.nome}</p>
-                <select data-id="${user._id}" data-nome="${user.nome}">
+                <select data-id="${user._id}" data-nome="${user.nome}" data-original="${statusAtual}">
                     <option value="P"  ${statusAtual === 'P'  ? 'selected' : ''}>P</option>
                     <option value="F"  ${statusAtual === 'F'  ? 'selected' : ''}>F</option>
                     <option value="FJ" ${statusAtual === 'FJ' ? 'selected' : ''}>FJ</option>
@@ -213,7 +244,18 @@ function fecharModal() {
 // ================== FUNÇÕES DE SALVAR ==================
 async function salvarModalData() {
     const selects = document.querySelectorAll('#modal-data-lista select');
-    const promessas = Array.from(selects).map(select => {
+    
+    // MÁGICA 2: Filtra a lista, separando APENAS os selects que o administrador alterou
+    const alterados = Array.from(selects).filter(s => s.value !== s.getAttribute('data-original'));
+
+    if (alterados.length === 0) {
+        alert("Nenhuma alteração foi feita.");
+        fecharModal();
+        return;
+    }
+
+    // Cria as requisições apenas para quem foi modificado
+    const promessas = alterados.map(select => {
         return fetch('/api/atualizar-frequencia', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -226,19 +268,37 @@ async function salvarModalData() {
     });
 
     try {
-        await Promise.all(promessas);
-        alert("Frequência da data salva com sucesso!");
+        const respostas = await Promise.all(promessas);
+        
+        // MÁGICA 3: Se o banco de dados falhar (retornar algo diferente de 200 OK), ele avisa!
+        const comErro = respostas.filter(r => !r.ok);
+        
+        if (comErro.length > 0) {
+            alert("⚠️ Algumas alterações falharam! Verifique a conexão com o banco de dados.");
+        } else {
+            alert("Frequência da data salva com sucesso!");
+        }
+        
         fecharModal();
         location.reload();
     } catch (error) {
         console.error("Erro ao salvar:", error);
-        alert("Ocorreu um erro ao salvar as alterações.");
+        alert("Ocorreu um erro ao conectar com o servidor.");
     }
 }
 
 async function salvarModalUsuario() {
     const selects = document.querySelectorAll('#modal-usuario-lista select');
-    const promessas = Array.from(selects).map(select => {
+    
+    const alterados = Array.from(selects).filter(s => s.value !== s.getAttribute('data-original'));
+
+    if (alterados.length === 0) {
+        alert("Nenhuma alteração foi feita.");
+        fecharModal();
+        return;
+    }
+
+    const promessas = alterados.map(select => {
         return fetch('/api/atualizar-frequencia', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -251,12 +311,19 @@ async function salvarModalUsuario() {
     });
 
     try {
-        await Promise.all(promessas);
-        alert("Frequência do aluno salva com sucesso!");
+        const respostas = await Promise.all(promessas);
+        const comErro = respostas.filter(r => !r.ok);
+        
+        if (comErro.length > 0) {
+            alert("⚠️ Algumas alterações falharam! Verifique a conexão com o banco de dados.");
+        } else {
+            alert("Frequência do aluno salva com sucesso!");
+        }
+        
         fecharModal();
         location.reload(); 
     } catch (error) {
         console.error("Erro ao salvar:", error);
-        alert("Ocorreu um erro ao salvar as alterações.");
+        alert("Ocorreu um erro ao conectar com o servidor.");
     }
 }
