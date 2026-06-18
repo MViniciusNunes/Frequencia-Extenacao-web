@@ -6,14 +6,11 @@ const tabelaUsuarios = document.querySelector('.tabela-usuarios');
 const tabelaFaltas   = document.querySelector('.tabela-faltas');
 
 // ================== UTILITÁRIO DE DATA ==================
-// Normaliza qualquer formato (ISO completo ou só data) para YYYY-MM-DD
 function normalizarData(dataStr) {
     if (!dataStr) return dataStr;
-    // Se vier no formato ISO (ex: 2026-06-25T19:00:00Z), pega só a parte da data
     return dataStr.toString().substring(0, 10);
 }
 
-// Formata YYYY-MM-DD para DD/MM/YYYY (mais legível)
 function formatarDataExibicao(dataStr) {
     const d = normalizarData(dataStr);
     if (!d || d.length < 10) return dataStr;
@@ -31,18 +28,41 @@ function contarFaltasPorData(data) {
     return Object.values(dia).filter(s => s === 'F').length;
 }
 
-// ================== RENDERIZAÇÃO ==================
+// ================== RENDERIZAÇÃO INTELIGENTE ==================
 function renderTabelaUsuarios() {
     const tbody = document.getElementById('tbody-usuarios');
     if(!tbody) return;
     tbody.innerHTML = '';
 
-    const termoBusca = document.getElementById('nome').value.toLowerCase();
+    const termoBusca = document.getElementById('nome').value.toLowerCase().trim();
+    
+    // REGEX: Verifica se a pessoa digitou algo como ">5", "<=3" ou apenas "5"
+    const regexNumerico = /^(>=|<=|>|<|=)?\s*(\d+)$/;
+    const matchNumerico = termoBusca.match(regexNumerico);
 
     usuarios.forEach(user => {
-        if (termoBusca && !user.nome.toLowerCase().includes(termoBusca)) return; 
-
         const faltas = contarFaltasPorUsuario(user.nome);
+        let mostrar = true;
+
+        if (termoBusca) {
+            if (matchNumerico) {
+                // Lógica de filtro matemático (por quantidade de faltas)
+                const operador = matchNumerico[1] || '='; // Se digitar só "5", assume que é "=5"
+                const valorFiltro = parseInt(matchNumerico[2], 10);
+                
+                if (operador === '>') mostrar = faltas > valorFiltro;
+                else if (operador === '<') mostrar = faltas < valorFiltro;
+                else if (operador === '>=') mostrar = faltas >= valorFiltro;
+                else if (operador === '<=') mostrar = faltas <= valorFiltro;
+                else if (operador === '=') mostrar = faltas === valorFiltro;
+            } else {
+                // Lógica de filtro normal por texto
+                mostrar = user.nome.toLowerCase().includes(termoBusca);
+            }
+        }
+
+        if (!mostrar) return;
+
         tbody.innerHTML += `
             <tr>
                 <td>${user.nome}</td>
@@ -57,14 +77,32 @@ function renderTabelaFaltas() {
     if(!tbody) return;
     tbody.innerHTML = '';
 
-    const termoBusca = document.getElementById('nome').value.toLowerCase();
+    const termoBusca = document.getElementById('nome').value.toLowerCase().trim();
+    const regexNumerico = /^(>=|<=|>|<|=)?\s*(\d+)$/;
+    const matchNumerico = termoBusca.match(regexNumerico);
 
     Object.keys(registros).forEach(dataKey => {
         const dataExibicao = formatarDataExibicao(dataKey);
-
-        if (termoBusca && !dataExibicao.toLowerCase().includes(termoBusca)) return;
-
         const faltas = contarFaltasPorData(dataKey);
+        let mostrar = true;
+
+        if (termoBusca) {
+            if (matchNumerico) {
+                const operador = matchNumerico[1] || '=';
+                const valorFiltro = parseInt(matchNumerico[2], 10);
+                
+                if (operador === '>') mostrar = faltas > valorFiltro;
+                else if (operador === '<') mostrar = faltas < valorFiltro;
+                else if (operador === '>=') mostrar = faltas >= valorFiltro;
+                else if (operador === '<=') mostrar = faltas <= valorFiltro;
+                else if (operador === '=') mostrar = faltas === valorFiltro;
+            } else {
+                mostrar = dataExibicao.toLowerCase().includes(termoBusca);
+            }
+        }
+
+        if (!mostrar) return;
+
         tbody.innerHTML += `
             <tr>
                 <td>${dataExibicao}</td>
@@ -91,12 +129,17 @@ function atualizarTabelas() {
 // ================== CARGA DE DADOS ==================
 async function carregarDadosIniciais() {
     try {
-        // CORREÇÃO: Atualizado para a nova rota do backend
         const respUsers = await fetch('/api/users-full');
         usuarios = await respUsers.json(); 
 
         const respFreq = await fetch('/api/frequencias-completas');
-        registros = await respFreq.json();       
+        const rawRegistros = await respFreq.json();
+
+        registros = {};
+        Object.keys(rawRegistros).forEach(dataKey => {
+            const dataNormalizada = normalizarData(dataKey);
+            registros[dataNormalizada] = rawRegistros[dataKey];
+        });
         
         atualizarTabelas(); 
     } catch (error) {
@@ -170,14 +213,13 @@ function fecharModal() {
 // ================== FUNÇÕES DE SALVAR ==================
 async function salvarModalData() {
     const selects = document.querySelectorAll('#modal-data-lista select');
-    
     const promessas = Array.from(selects).map(select => {
         return fetch('/api/atualizar-frequencia', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 nome: select.getAttribute('data-nome'),
-                data: dataAtiva, // já está normalizado (YYYY-MM-DD)
+                data: dataAtiva, 
                 status: select.value
             })
         });
@@ -196,14 +238,13 @@ async function salvarModalData() {
 
 async function salvarModalUsuario() {
     const selects = document.querySelectorAll('#modal-usuario-lista select');
-    
     const promessas = Array.from(selects).map(select => {
         return fetch('/api/atualizar-frequencia', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 nome: usuarioAtivo,
-                data: select.getAttribute('data-data'), // já normalizado
+                data: select.getAttribute('data-data'), 
                 status: select.value
             })
         });
