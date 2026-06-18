@@ -153,28 +153,34 @@ carregarMeuHistorico();
 // ==========================================
 // FUNÇÃO 4: LIGAR A CÂMERA E LER QR CODE
 // ==========================================
+let bloqueioCamera = false;
+
 function iniciarCamera() {
-    // Inicia o leitor apontando para a div "leitor-camera"
     const html5QrcodeScanner = new Html5QrcodeScanner(
         "leitor-camera",
         { fps: 10, qrbox: { width: 250, height: 250 } }, 
         false
     );
 
-    html5QrcodeScanner.render((textoDecodificado) => {
-        // 1. O celular achou o código! Preenche o input
+    html5QrcodeScanner.render(async (textoDecodificado) => {
+        // 1. Se a câmera estiver travada processando o código anterior, ela ignora a leitura
+        if (bloqueioCamera) return; 
+        
+        // 2. Trava a câmera
+        bloqueioCamera = true; 
+        
+        // 3. Preenche o input e tenta enviar
         document.getElementById('codigo-encontro').value = textoDecodificado;
-        
-        // 2. Para a câmera para não ler repetido
-        html5QrcodeScanner.clear();
-        
-        // 3. Aperta o botão "Confirmar" virtualmente
-        registrarPorCodigo();
+        await registrarPorCodigo();
+
+        // 4. Espera 2 segundos para destravar a câmera (assim o aluno pode tentar de novo se deu erro)
+        setTimeout(() => {
+            bloqueioCamera = false;
+        }, 2000);
 
     }, (erroLeitura) => {
-        // Ignora erros normais enquanto a câmera foca
+        // Ignora erros normais de foco da câmera
     });
 }
 
-// Inicia a câmera assim que a página carrega
 iniciarCamera();

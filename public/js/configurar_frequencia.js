@@ -9,8 +9,8 @@ function gerarCodigo() {
     return code;
 }
 
-// Apenas prepara os dados e vai para a tela do QR, SEM salvar no banco ainda
-function irParaQR() {
+// Salva no banco de dados e DEPOIS vai para a tela do QR
+async function irParaQR() {
     const nome  = document.getElementById('input-nome').value.trim();
     const tipo  = document.getElementById('input-tipo').value;
     const data  = document.getElementById('input-data').value;
@@ -24,9 +24,24 @@ function irParaQR() {
     const codigo = gerarCodigo();
     const registro = { codigo, nome, tipo, data, descricao };
 
-    // Guarda na memória provisória e vai para a tela do QR Code
-    sessionStorage.setItem('registroAtual', JSON.stringify(registro));
-    window.location.href = 'frequencia_qrcode.html';
+    try {
+        // Manda pro banco de dados AGORA!
+        const response = await fetch('/api/encontros', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(registro)
+        });
+
+        if (response.ok) {
+            sessionStorage.setItem('registroAtual', JSON.stringify(registro));
+            window.location.href = 'frequencia_qrcode.html';
+        } else {
+            alert('Erro ao salvar o encontro no banco de dados.');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro de conexão com o servidor.');
+    }
 }
 
 function cancelar() {
