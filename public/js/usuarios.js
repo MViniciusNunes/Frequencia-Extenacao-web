@@ -5,28 +5,46 @@ async function carregarUsuarios() {
     try {
         const response = await fetch('/api/users');
         listaUsuarios = await response.json(); 
+        
+        // Alerta para a consola para podermos depurar (debug) se for preciso
+        console.log("Dados recebidos da base de dados:", listaUsuarios); 
+        
+        // Proteção: Se a API falhar e não devolver uma lista, paramos aqui
+        if (!Array.isArray(listaUsuarios)) {
+            console.error("Erro crítico: A resposta não é um Array válido.");
+            return;
+        }
+        
         renderTabelaUsuarios();
     } catch (error) {
-        console.error("Erro ao buscar usuários:", error);
+        console.error("Erro ao procurar utilizadores:", error);
     }
 }
 
 // ================= RENDERIZAR TABELA =================
 function renderTabelaUsuarios() {
     const tbody = document.getElementById('tbody-usuarios');
-    if(!tbody) return;
+    const tabelaInteira = document.querySelector('.tabela-usuarios'); // Busca a tabela no HTML
+    
+    if(!tbody || !tabelaInteira) return;
+    
+    // A MÁGICA AQUI: Força o CSS a mostrar a tabela na tela!
+    tabelaInteira.style.display = 'table'; 
+    
     tbody.innerHTML = '';
 
-    // Pega o que está digitado na barra de pesquisa (se houver)
-    const termoBusca = document.getElementById('nome').value.toLowerCase();
+    const inputNode = document.getElementById('nome');
+    const termoBusca = inputNode ? inputNode.value.toLowerCase() : '';
 
     listaUsuarios.forEach(user => {
-        // Filtro em tempo real
+        if (!user || !user.nome) {
+            return; 
+        }
+
         if (termoBusca && !user.nome.toLowerCase().includes(termoBusca)) {
             return; 
         }
 
-        // Desenha a linha com o nome e o botão vermelho
         tbody.innerHTML += `
             <tr>
                 <td>${user.nome}</td>
@@ -44,44 +62,36 @@ function renderTabelaUsuarios() {
 // ================= GATILHO DA PESQUISA =================
 const inputPesquisa = document.getElementById('nome');
 if (inputPesquisa) {
-    // Atualiza a tabela a cada letra digitada
     inputPesquisa.addEventListener('input', renderTabelaUsuarios);
 }
 
 // ================= LÓGICA DE EXCLUSÃO (POP-UP) =================
 async function confirmarExclusao(idUsuario, nomeUsuario) {
-    // 1. Gera o Pop-up na tela pedindo a palavra de segurança
-    const palavraDigitada = prompt(`⚠ ATENÇÃO!\n\nVocê está prestes a excluir permanentemente o usuário:\n"${nomeUsuario}"\n\nPara confirmar essa ação irreversível, digite a palavra: apagar`);
+    const palavraDigitada = prompt(`⚠ ATENÇÃO!\n\nEstás prestes a excluir permanentemente o utilizador:\n"${nomeUsuario}"\n\nPara confirmar esta ação irreversível, escreve a palavra: apagar`);
     
-    // 2. Se o administrador cancelar o prompt, a variável vem como 'null' e a função para
     if (palavraDigitada === null) {
         return;
     }
 
-    // 3. Valida se a pessoa digitou exatamente "apagar" (ignorando letras maiúsculas ou espaços sobrando)
     if (palavraDigitada.toLowerCase().trim() === 'apagar') {
         try {
-            // Dispara a ordem de deleção para o nosso back-end
             const response = await fetch(`/api/users/${idUsuario}`, {
                 method: 'DELETE'
             });
 
             if (response.ok) {
-                alert("Usuário excluído com sucesso!");
-                // Recarrega a tabela para o nome sumir da tela instantaneamente
+                alert("Utilizador excluído com sucesso!");
                 carregarUsuarios(); 
             } else {
-                alert("Erro ao excluir usuário no servidor.");
+                alert("Erro ao excluir utilizador no servidor.");
             }
         } catch (error) {
             console.error("Erro na requisição:", error);
-            alert("Erro de conexão com o banco de dados.");
+            alert("Erro de ligação com a base de dados.");
         }
     } else {
-        // Se a pessoa digitou qualquer outra coisa, bloqueia a ação
         alert("❌ Palavra incorreta. A exclusão foi cancelada por segurança.");
     }
 }
 
-// Inicia a tela buscando todo mundo do banco de dados
 carregarUsuarios();
