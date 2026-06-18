@@ -17,7 +17,7 @@ router.post('/users', async (req, res) => {
     }
 });
 
-// ===== Rota de Login =====
+
 // ===== Rota de Login =====
 router.post('/login', async (req, res) => {
     try {
@@ -25,7 +25,7 @@ router.post('/login', async (req, res) => {
         const user = await Usuario.findOne({ usuario: usuario, senha: senha });
         
         if (user) {
-            // A MÁGICA AQUI: Agora o servidor avisa se a pessoa é Admin ou não
+            // CONFIRME SE A LINHA ABAIXO TEM O isAdmin: user.isAdmin
             return res.status(200).json({ 
                 id: user._id, 
                 nome: user.nome, 
@@ -156,6 +156,44 @@ router.delete('/users/:id', async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({ erro: "Erro ao excluir: " + err.message });
+    }
+});
+
+// ===== Rota: Marcar Presença pelo Aluno (Via Código) =====
+router.post('/marcar-presenca', async (req, res) => {
+    try {
+        const { usuarioId, codigo } = req.body;
+        
+        // 1. Procura se existe algum encontro com esse código exato
+        const encontro = await Encontro.findOne({ codigo: codigo });
+        if (!encontro) {
+            return res.status(404).json({ erro: "Código inválido ou encontro não encontrado." });
+        }
+        
+        // 2. Se achar, marca a presença ('P') para este usuário neste encontro
+        await Frequencia.findOneAndUpdate(
+            { encontroId: encontro._id, usuarioId: usuarioId },
+            { status: 'P' },
+            { upsert: true, new: true } // Upsert cria o registro se não existir
+        );
+        
+        res.status(200).json({ mensagem: "Presença confirmada com sucesso!" });
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
+});
+
+// ===== Rota: Buscar Frequência Específica do Aluno =====
+router.get('/minha-frequencia/:id', async (req, res) => {
+    try {
+        const usuarioId = req.params.id;
+        // Puxa APENAS os registros que pertencem a este usuário, escondendo o resto
+        const historico = await Frequencia.find({ usuarioId: usuarioId })
+            .populate('encontroId', 'nome data'); 
+            
+        res.status(200).json(historico);
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
     }
 });
 

@@ -1,5 +1,4 @@
 async function entrar() {
-    // Busca os campos de texto do seu HTML do jeito que eles estão configurados
     const inputUsuario = document.querySelector('input[type="text"]');
     const inputSenha = document.querySelector('input[type="password"]');
 
@@ -21,17 +20,15 @@ async function entrar() {
         if (response.ok) {
             const dadosDoUsuario = await response.json();
             
-            // Salva as informações de quem logou (nome, id e se é admin) na memória do navegador
             sessionStorage.setItem('usuarioLogado', JSON.stringify(dadosDoUsuario));
 
             // ==========================================
-            // A BIFURCAÇÃO DE ACESSO (ADMIN vs ALUNO)
+            // BIFURCAÇÃO À PROVA DE FALHAS
+            // Agora ele aceita tanto o Booleano quanto o Texto "true"
             // ==========================================
-            if (dadosDoUsuario.isAdmin === true) {
-                // Se tiver o "crachá" de administrador, vai para o Menu
+            if (dadosDoUsuario.isAdmin === true || String(dadosDoUsuario.isAdmin).toLowerCase() === "true") {
                 window.location.href = 'menu.html';
             } else {
-                // Se for um aluno comum, vai para o Painel do Aluno
                 window.location.href = 'painel_aluno.html';
             }
             

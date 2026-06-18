@@ -2,17 +2,61 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Aluno</title>
-    <link rel="stylesheet" href="css/menu.css"> 
+    <link rel="stylesheet" href="css/frequencia.css"> 
 </head>
 <body>
-    <main class="menu-container" style="text-align: center; margin-top: 50px;">
-        <h1 style="color: #224bb8;">Bem-vindo ao Painel do Aluno!</h1>
-        <p>Você logou com sucesso em uma conta de usuário comum.</p>
+
+<main class="usuarios">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 id="boas-vindas" style="margin: 0; color: #224bb8;">Olá, Aluno!</h1>
+        <button class="cancelar" onclick="sair()" style="cursor: pointer;">Sair</button>
+    </div>
+
+    <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.08); margin-bottom: 30px; text-align: center;">
+        <h2 style="color: #224bb8; margin-top: 0;">Registrar Presença</h2>
         
-        <button class="editar" onclick="window.location.href='login.html'" style="margin-top: 20px; padding: 10px 20px; cursor: pointer;">
-            Sair
-        </button>
-    </main>
+        <div style="width: 150px; height: 150px; background: #eee; border: 2px dashed #ccc; border-radius: 15px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; color: #888;">
+            <p style="margin: 0;">📸 Câmera (Em Breve)</p>
+        </div>
+
+        <p>Ou digite o código do encontro fornecido pelo professor:</p>
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+            <input type="text" id="codigo-encontro" class="meu-input" placeholder="Ex: KS8596L" style="text-transform: uppercase; text-align: center; font-weight: bold; font-size: 18px;">
+            <button class="editar" onclick="registrarPorCodigo()">Confirmar</button>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 20px; justify-content: space-between; margin-bottom: 30px;">
+        <div style="flex: 1; background: #e8f5e9; padding: 20px; border-radius: 15px; text-align: center;">
+            <h3 style="color: #2e7d32; margin: 0;">Presenças (P)</h3>
+            <h2 id="qtd-p" style="font-size: 36px; margin: 10px 0 0 0; color: #2e7d32;">0</h2>
+        </div>
+        <div style="flex: 1; background: #ffebee; padding: 20px; border-radius: 15px; text-align: center;">
+            <h3 style="color: #c62828; margin: 0;">Faltas (F)</h3>
+            <h2 id="qtd-f" style="font-size: 36px; margin: 10px 0 0 0; color: #c62828;">0</h2>
+        </div>
+        <div style="flex: 1; background: #fff8e1; padding: 20px; border-radius: 15px; text-align: center;">
+            <h3 style="color: #f57f17; margin: 0;">Justificadas (FJ)</h3>
+            <h2 id="qtd-fj" style="font-size: 36px; margin: 10px 0 0 0; color: #f57f17;">0</h2>
+        </div>
+    </div>
+
+    <table style="display: table;">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Encontro</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-historico">
+            </tbody>
+    </table>
+
+</main>
+
+<script src="js/painel_aluno.js"></script>
 </body>
 </html>
