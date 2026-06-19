@@ -85,3 +85,42 @@ async function salvarModalUsuario() {
         alert("Ocorreu um erro ao conectar com o servidor.");
     }
 }
+
+async function confirmarExclusaoEncontro(encId) {
+    const enc = registros[encId];
+    if (!enc || !enc.info) return;
+
+    const nomeEncontro = enc.info.nome || 'Este encontro';
+    const dataExibicao = formatarDataExibicao(enc.info.data);
+
+    const palavraDigitada = prompt(
+        `⚠ ATENÇÃO!\n\nVocê está prestes a excluir permanentemente o encontro:\n"${nomeEncontro} (${dataExibicao})"\n\nTodo o histórico de presenças e faltas atrelado a este dia será apagado e não poderá ser desfeito!\n\nPara confirmar, escreve a palavra: apagar`
+    );
+
+    if (palavraDigitada === null) return;
+
+    if (palavraDigitada.toLowerCase().trim() === 'apagar') {
+        const usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+
+        try {
+            const response = await fetch(`/api/encontros/${encId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${usuarioLogado.token}` 
+                }
+            });
+
+            if (response.ok) {
+                alert("✅ Encontro excluído com sucesso!");
+                location.reload(); 
+            } else {
+                alert("❌ Erro ao excluir encontro no servidor.");
+            }
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+            alert("Erro de conexão com o banco de dados.");
+        }
+    } else {
+        alert("❌ Palavra incorreta. A exclusão foi cancelada por segurança.");
+    }
+}

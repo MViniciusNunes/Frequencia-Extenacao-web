@@ -95,12 +95,23 @@ function renderTabelaFaltas() {
         }
 
         if (!mostrar) return;
-
+        
+        const nomeEncontro = enc.info.nome || 'Encontro sem nome';
+        const dataLimpa = formatarDataExibicao(enc.info.data); 
+        
         tbody.innerHTML += `
             <tr>
-                <td>${dataExibicao}</td>
+                <td><strong>${nomeEncontro}</strong> <br> <small>${dataLimpa}</small></td>
                 <td>${faltas} falta(s)</td>
-                <td><button class="editar" onclick="abrirModalData('${encId}')">Editar</button></td>
+                <td style="display: flex; gap: 8px; justify-content: center;">
+                    <button class="editar" onclick="abrirModalData('${encId}')">Editar</button>
+                    <button style="padding: 8px 12px; background: #d9534f; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background 0.3s ease;" 
+                            onmouseover="this.style.background='#c9302c'" 
+                            onmouseout="this.style.background='#d9534f'" 
+                            onclick="confirmarExclusaoEncontro('${encId}')">
+                        Excluir
+                    </button>
+                </td>
             </tr>`;
     });
 }

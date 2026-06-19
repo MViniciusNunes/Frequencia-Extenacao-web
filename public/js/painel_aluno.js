@@ -88,10 +88,10 @@ async function carregarMeuHistorico() {
             const dataFormatada = formatarDataExibicao(enc.info.data);
             const nomeEncontro = enc.info.nome || 'Encontro sem nome';
 
-            tbody.innerHTML += `
+          tbody.innerHTML += `
                 <tr>
-                    <td>${dataFormatada}</td>
                     <td>${nomeEncontro}</td>
+                    <td>${dataFormatada}</td>
                     <td class="status-historico ${classeStatus}">${status}</td>
                 </tr>
             `;
